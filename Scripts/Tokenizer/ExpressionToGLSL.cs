@@ -515,6 +515,7 @@ namespace ExpressionToGLSL
         /// </summary>
         private class AstVariableZ : AstNode
         {
+            
             public override string ToGlsl()
             {
                 return "z";
