@@ -3,7 +3,7 @@ using System;
 
 public partial class PauseMenu : CanvasLayer
 {
-    [Export] public TextEdit textEdit;
+    [Export] public LineEdit textEdit;
     public bool paused = false;
 
     public override void _Ready()

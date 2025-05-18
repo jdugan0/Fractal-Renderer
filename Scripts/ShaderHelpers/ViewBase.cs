@@ -12,7 +12,7 @@ public partial class ViewBase : Sprite2D
 
     int _w, _h;
     ImageTexture _tex = new ImageTexture();
-    ShaderMaterial _mat;
+    public ShaderMaterial _mat;
 
     public override void _Ready()
     {

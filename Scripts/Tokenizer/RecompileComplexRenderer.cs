@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class RecompileComplexRenderer : TextEdit
+public partial class RecompileComplexRenderer : LineEdit
 {
     [Export] Sprite2D sprite;
     [Export] Godot.ShaderMaterial shader;
@@ -41,5 +41,9 @@ public partial class RecompileComplexRenderer : TextEdit
         {
             GD.Print("parse failed :(");
         }
+    }
+    public void recompile(String newText)
+    {
+        recompile();
     }
 }
