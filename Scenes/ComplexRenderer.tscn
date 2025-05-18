@@ -36,13 +36,12 @@ shader = SubResource("ShaderMaterial_ochr1")
 layer = 96
 textEdit = NodePath("../CanvasLayer/TextEdit")
 
-[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("textEdit", "pause")]
+[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("TextEdit", "pauseMenu")]
 texture_filter = 1
 material = SubResource("ShaderMaterial_8cjuv")
 script = ExtResource("3_ouy2c")
-textEdit = NodePath("../CanvasLayer/TextEdit")
-speed = 1.0
-pause = NodePath("../Pause")
+TextEdit = NodePath("../CanvasLayer/TextEdit")
+pauseMenu = NodePath("../Pause")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
