@@ -10,7 +10,9 @@ public partial class ComplexRenderer : Sprite2D
     [Export] public TextEdit textEdit;
     public float zoom = 0.1f;
     [Export] public float speed;
-    public Vector2 offset = new Vector2(0,0);
+    public Vector2 offset = new Vector2(0, 0);
+
+    [Export] public PauseMenu pause;
     public override void _Ready()
     {
         material = (ShaderMaterial)Material;
@@ -34,7 +36,7 @@ public partial class ComplexRenderer : Sprite2D
                 doStuff = false;
             }
         }
-        if (doStuff)
+        if (doStuff && !pause.paused)
         {
             if (Input.IsActionPressed("UP"))
             {
@@ -72,7 +74,8 @@ public partial class ComplexRenderer : Sprite2D
         SendData(material);
     }
 
-    public void SendData(ShaderMaterial m){
+    public void SendData(ShaderMaterial m)
+    {
         m.SetShaderParameter("offset", offset);
         m.SetShaderParameter("zoomFactor", zoom);
     }

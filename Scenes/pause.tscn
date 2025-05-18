@@ -1,0 +1,55 @@
+[gd_scene load_steps=2 format=3 uid="uid://nd83sbyol6gj"]
+
+[ext_resource type="Script" uid="uid://csfn0a6h1vhpf" path="res://Scripts/PauseMenu.cs" id="1_o80xk"]
+
+[node name="Pause" type="CanvasLayer"]
+script = ExtResource("1_o80xk")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Button" type="Button" parent="Control/Panel"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -308.0
+offset_top = 153.0
+offset_right = 319.0
+offset_bottom = 409.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 156
+text = "RESUME"
+
+[node name="Button2" type="Button" parent="Control/Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -243.0
+offset_top = -371.0
+offset_right = 257.0
+offset_bottom = -141.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 151
+text = "MENU"
+
+[connection signal="pressed" from="Control/Panel/Button" to="." method="TogglePause"]
+[connection signal="pressed" from="Control/Panel/Button2" to="." method="Menu"]
+[connection signal="pressed" from="Control/Panel/Button2" to="Control" method="Menu"]

@@ -188,7 +188,7 @@ vec2 transform(vec2 a, vec2 res){
 vec3 hsv_to_rgb(float hue_degrees, float saturation, float value)
 {
     // Normalize hue to [0, 360)
-    float h = mod(hue_degrees, 360.0);
+    float h = mod(hue_degrees+180.0, 360.0);
     float s = clamp(saturation, 0.0, 1.0);
     float v = clamp(value, 0.0, 1.0);
 
