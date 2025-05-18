@@ -1,0 +1,47 @@
+[gd_scene load_steps=2 format=3 uid="uid://drmawjx4triuj"]
+
+[ext_resource type="Script" uid="uid://cgaohq5rirru4" path="res://Scripts/MainMenu.cs" id="1_tt5f1"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tt5f1")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 100
+alignment = 1
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 75
+text = "Newton"
+
+[node name="Button2" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 75
+text = "Mandlebrot"
+
+[node name="Button3" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 75
+text = "Complex"
+
+[node name="Button4" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 75
+text = "Quit"
+
+[connection signal="pressed" from="VBoxContainer/Button" to="." method="Switch" binds= [3]]
+[connection signal="pressed" from="VBoxContainer/Button2" to="." method="Switch" binds= [2]]
+[connection signal="pressed" from="VBoxContainer/Button3" to="." method="Switch" binds= [1]]
+[connection signal="pressed" from="VBoxContainer/Button4" to="." method="Quit"]

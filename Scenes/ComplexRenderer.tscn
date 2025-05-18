@@ -1,0 +1,43 @@
+[gd_scene load_steps=6 format=3 uid="uid://ca41xtr4e0rvs"]
+
+[ext_resource type="Script" uid="uid://bx3qv3e3o08mn" path="res://Scripts/Tokenizer/RecompileComplexRenderer.cs" id="1_0s2d5"]
+[ext_resource type="Shader" uid="uid://bb010k416ytxw" path="res://Scripts/Shaders/ComplexRenderer.gdshader" id="2_ochr1"]
+[ext_resource type="Script" uid="uid://dmip8rkr5pujv" path="res://Scripts/ShaderHelpers/ComplexRenderer.cs" id="3_ouy2c"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ochr1"]
+shader = ExtResource("2_ochr1")
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/zoomFactor = 1.0
+shader_parameter/render = false
+shader_parameter/prime = false
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8cjuv"]
+shader = ExtResource("2_ochr1")
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/zoomFactor = 0.0
+shader_parameter/render = false
+shader_parameter/prime = false
+
+[node name="ComplexRenderer" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="TextEdit" type="TextEdit" parent="CanvasLayer" node_paths=PackedStringArray("sprite")]
+offset_right = 640.0
+offset_bottom = 86.0
+theme_override_font_sizes/font_size = 46
+text = "((1/z)^18 - 1/z) / (1/z - 1)"
+script = ExtResource("1_0s2d5")
+sprite = NodePath("../../Sprite2D")
+shader = SubResource("ShaderMaterial_ochr1")
+
+[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("textEdit")]
+texture_filter = 1
+material = SubResource("ShaderMaterial_8cjuv")
+script = ExtResource("3_ouy2c")
+textEdit = NodePath("../CanvasLayer/TextEdit")
+speed = 1.0
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[connection signal="text_changed" from="CanvasLayer/TextEdit" to="CanvasLayer/TextEdit" method="recompile"]
