@@ -19,10 +19,10 @@ namespace ExpressionToGLSL
         /// )
         /// 
         /// Also supports imaginary parts via 'i' and negative numbers like "-3.14" or "-2.5i".
-        public static string ConvertExpressionToGlsl(string expression)
+        public static string ConvertExpressionToGlsl(string expression, bool useC)
         {
             // 1) Tokenize the input
-            List<Token> tokens = Tokenize(expression);
+            List<Token> tokens = Tokenize(expression, useC);
 
             // 2) Parse into an abstract syntax tree (AST)
             Parser parser = new Parser(tokens);
@@ -71,7 +71,7 @@ namespace ExpressionToGLSL
         /// For example "(1/z)^18 + z^3" => LParen, Number("1"), Slash, Z, RParen, Caret, Number("18"), Plus, Z, Caret, Number("3"), EOF
         /// Also supports something like "-3.14i" or "1.2i" or just "i" for 1i.
         /// </summary>
-        private static List<Token> Tokenize(string input)
+        private static List<Token> Tokenize(string input, bool useC)
         {
             List<Token> tokens = new List<Token>();
             int pos = 0;
@@ -139,6 +139,11 @@ namespace ExpressionToGLSL
                     tokens.Add(new Token(TokenType.Z, "z"));
                     pos++;
                 }
+                else if ((c == 'c' || c == 'C') && useC)
+                {
+                    tokens.Add(new Token(TokenType.Z, "c"));
+                    pos++;
+                }
                 else if (char.IsDigit(c) || c == '.' || c == 'i')
                 {
                     // Parse a numeric literal, possibly with an 'i' for imaginary.
@@ -176,7 +181,8 @@ namespace ExpressionToGLSL
                         tokens.Add(new Token(TokenType.Number, Mathf.Pi.ToString()));
                         pos += 2;
                     }
-                    else if (input.Substring(pos).ToLower().StartsWith("acos")){
+                    else if (input.Substring(pos).ToLower().StartsWith("acos"))
+                    {
                         tokens.Add(new Token(TokenType.Identifier, "acos"));
                         pos += 4;
                     }
@@ -409,7 +415,7 @@ namespace ExpressionToGLSL
                 else if (Match(TokenType.Z))
                 {
                     Token t = Eat(TokenType.Z);
-                    return new AstVariableZ();
+                    return new AstVariableZ(t.Text);
                 }
                 else
                 {
@@ -515,10 +521,15 @@ namespace ExpressionToGLSL
         /// </summary>
         private class AstVariableZ : AstNode
         {
-            
+            string character = "z";
+            public AstVariableZ(string character)
+            {
+                this.character = character;
+            }
+            public AstVariableZ() { }
             public override string ToGlsl()
             {
-                return "z";
+                return character;
             }
         }
 

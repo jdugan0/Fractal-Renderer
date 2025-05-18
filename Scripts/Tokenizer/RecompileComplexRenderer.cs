@@ -5,6 +5,7 @@ public partial class RecompileComplexRenderer : LineEdit
 {
     [Export] Sprite2D sprite;
     [Export] Godot.ShaderMaterial shader;
+    [Export] bool useC;
     String oldCode;
     bool outside = true;
     public override void _Ready()
@@ -27,19 +28,26 @@ public partial class RecompileComplexRenderer : LineEdit
     {
         try
         {
-            String glsl = ExpressionToGLSL.ExpressionParser.ConvertExpressionToGlsl(Text);
+            String glsl = ExpressionToGLSL.ExpressionParser.ConvertExpressionToGlsl(Text, useC);
             String code = oldCode;
             code = code.Replace("vec2(0.00)", glsl);
-            // GD.Print(glsl);
+
             var shaderNew = new Godot.Shader();
             shaderNew.Code = code;
             var mat = new ShaderMaterial();
             mat.Shader = shaderNew;
             sprite.Material = mat;
+            var styleBox = new StyleBoxFlat();
+            styleBox.BgColor = new Color(0.1f, 0.1f, 0.1f);
+
+            AddThemeStyleboxOverride("normal", styleBox);
         }
         catch
         {
-            GD.Print("parse failed :(");
+            var styleBox = new StyleBoxFlat();
+            styleBox.BgColor = new Color(0.7f, 0.1f, 0.1f);
+
+            AddThemeStyleboxOverride("normal", styleBox);
         }
     }
     public void recompile(String newText)

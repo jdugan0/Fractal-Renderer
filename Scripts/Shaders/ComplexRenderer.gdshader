@@ -228,7 +228,6 @@ vec2 funcPrime(vec2 z){
 }
 
 void fragment() {
-	bool early = false;
 	vec2 res = vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y);
 	vec2 scale = transform(vec2((UV.x) / SCREEN_PIXEL_SIZE.x, (UV.y) /SCREEN_PIXEL_SIZE.y), res);
 	//- vec2(16.0/9.0,1);
