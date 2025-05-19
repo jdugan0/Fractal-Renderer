@@ -1,0 +1,65 @@
+[gd_scene load_steps=5 format=3 uid="uid://4ps2lq1e6o73"]
+
+[ext_resource type="Shader" uid="uid://dl7afeptw68kh" path="res://Scripts/Shaders/NewtonRenderer.gdshader" id="2_xetub"]
+[ext_resource type="PackedScene" uid="uid://nd83sbyol6gj" path="res://Scenes/pause.tscn" id="3_br55d"]
+[ext_resource type="Script" uid="uid://duel8ovby28tx" path="res://Scripts/ShaderHelpers/NewtonRenderer.cs" id="3_xetub"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8cjuv"]
+shader = ExtResource("2_xetub")
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/zoomFactor = 0.0
+shader_parameter/roots = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/idClose = -1
+shader_parameter/rootCount = 0
+shader_parameter/color = 0
+
+[node name="ComplexRenderer" type="Node2D"]
+
+[node name="Pause" parent="." instance=ExtResource("3_br55d")]
+layer = 96
+visible = false
+
+[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("pauseMenu")]
+texture_filter = 1
+material = SubResource("ShaderMaterial_8cjuv")
+script = ExtResource("3_xetub")
+pauseMenu = NodePath("../Pause")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Control" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="OptionButton" type="OptionButton" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -146.0
+offset_top = -58.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 36
+selected = 0
+item_count = 4
+popup/item_0/text = "Red"
+popup/item_0/id = 0
+popup/item_1/text = "Blue"
+popup/item_1/id = 1
+popup/item_2/text = "Purple"
+popup/item_2/id = 2
+popup/item_3/text = "HSV"
+popup/item_3/id = 3
+
+[connection signal="item_selected" from="CanvasLayer/Control/OptionButton" to="Sprite2D" method="setColor"]

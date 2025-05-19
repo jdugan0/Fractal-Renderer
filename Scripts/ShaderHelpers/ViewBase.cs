@@ -10,7 +10,7 @@ public partial class ViewBase : Sprite2D
 
     [Export] public PauseMenu pauseMenu;
 
-    int _w, _h;
+    public int _w, _h;
     ImageTexture _tex = new ImageTexture();
     public ShaderMaterial _mat;
 

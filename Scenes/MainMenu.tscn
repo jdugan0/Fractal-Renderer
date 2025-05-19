@@ -29,7 +29,7 @@ text = "Newton"
 [node name="Button2" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 75
-text = "Mandlebrot"
+text = "Fractal"
 
 [node name="Button3" type="Button" parent="VBoxContainer"]
 layout_mode = 2
