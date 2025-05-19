@@ -36,6 +36,7 @@ void fragment(){
 	vec2 last = z;
 	vec2 epsilon = vec2(1e-6);
 	vec2 lastPrime = (func(vec2(0.0) + epsilon,c) - func(vec2(0.0),c)) / epsilon;
+	float bailout = 256.0;
     for(int i=0;i<MAX_ITERS;i++){
         z = func(z, c);
 		vec2 d1 = z - last;
@@ -48,8 +49,8 @@ void fragment(){
 		vec2 delta = z - c;
         float r2 = dot(delta,delta);
         trap = min(trap, r2);
-        if(r2 > 256.0){
-            mu = float(i) - log2(log2(r2)) + 4.0;
+        if(r2 > bailout){
+            mu = float(i) - log2(log2(r2)) + log2(log2(bailout));
             esc = true;
             break;
         }

@@ -1,6 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://drmawjx4triuj"]
+[gd_scene load_steps=7 format=3 uid="uid://drmawjx4triuj"]
 
 [ext_resource type="Script" uid="uid://cgaohq5rirru4" path="res://Scripts/MainMenu.cs" id="1_tt5f1"]
+[ext_resource type="Texture2D" uid="uid://dcwct2iu8fj56" path="res://Sprites/Fractal.png" id="2_df05h"]
+[ext_resource type="Script" uid="uid://dn8gx8qpcdtno" path="res://Scripts/MenuImage.cs" id="3_8um5k"]
+[ext_resource type="Texture2D" uid="uid://5r3edtnxhgwh" path="res://Sprites/Newton.png" id="4_xim88"]
+[ext_resource type="Texture2D" uid="uid://cma2l8os3ut6o" path="res://Sprites/Complex.png" id="5_koqhg"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_tt5f1"]
+texture = ExtResource("2_df05h")
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -10,6 +17,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_tt5f1")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_tt5f1")
+script = ExtResource("3_8um5k")
+images = Array[Texture2D]([ExtResource("4_xim88"), ExtResource("2_df05h"), ExtResource("5_koqhg")])
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -41,7 +59,10 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 75
 text = "Quit"
 
+[connection signal="mouse_entered" from="VBoxContainer/Button" to="Panel" method="SwitchImage" binds= [0]]
 [connection signal="pressed" from="VBoxContainer/Button" to="." method="Switch" binds= [3]]
+[connection signal="mouse_entered" from="VBoxContainer/Button2" to="Panel" method="SwitchImage" binds= [1]]
 [connection signal="pressed" from="VBoxContainer/Button2" to="." method="Switch" binds= [2]]
+[connection signal="mouse_entered" from="VBoxContainer/Button3" to="Panel" method="SwitchImage" binds= [2]]
 [connection signal="pressed" from="VBoxContainer/Button3" to="." method="Switch" binds= [1]]
 [connection signal="pressed" from="VBoxContainer/Button4" to="." method="Quit"]
