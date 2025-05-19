@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Godot;
 
 namespace ExpressionToGLSL
@@ -66,6 +67,18 @@ namespace ExpressionToGLSL
             public override string ToString() => $"{Type}('{Text}'){(IsImag ? "[i]" : "")}";
         }
 
+
+        public static bool checkNextLetter(string input, int id)
+        {
+            if (id < input.Length - 1)
+            {
+                if (char.IsLetter(input[id + 1]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         /// <summary>
         /// Convert a raw string into a list of tokens.
         /// For example "(1/z)^18 + z^3" => LParen, Number("1"), Slash, Z, RParen, Caret, Number("18"), Plus, Z, Caret, Number("3"), EOF
@@ -139,7 +152,7 @@ namespace ExpressionToGLSL
                     tokens.Add(new Token(TokenType.Z, "z"));
                     pos++;
                 }
-                else if ((c == 'c' || c == 'C') && useC)
+                else if ((c == 'c' || c == 'C') && useC && checkNextLetter(input, pos))
                 {
                     tokens.Add(new Token(TokenType.Z, "c"));
                     pos++;

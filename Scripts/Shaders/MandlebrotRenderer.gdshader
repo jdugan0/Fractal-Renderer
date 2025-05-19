@@ -28,7 +28,7 @@ void fragment(){
     vec2 c = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x, UV.y/SCREEN_PIXEL_SIZE.y), res, zoomFactor, offset);
 
     vec2 z = func(vec2(0.0),c);
-    float trap = 1e20;
+    float trap = 1e10;
     float mu   = 0.0;
     bool esc   = false;
     const int MAX_ITERS = 250;
@@ -40,7 +40,7 @@ void fragment(){
     for(int i=0;i<MAX_ITERS;i++){
         z = func(z, c);
 		vec2 d1 = z - last;
-		vec2 prime = (func(z + epsilon, c) - z) / epsilon;
+		vec2 prime = (func(z + epsilon, c) - func(z,c)) / epsilon;
 		vec2 dprime = prime - lastPrime;
 		//if ((dot(d1,d1) < 1e-15) && i > MIN_ITERS){
 			//esc = false;
@@ -50,7 +50,8 @@ void fragment(){
         float r2 = dot(delta,delta);
         trap = min(trap, r2);
         if(r2 > bailout){
-            mu = float(i) - log2(log2(r2)) + log2(log2(bailout));
+			float safe_r2 = max(r2, 1.000001); 
+            mu = float(i) - log2(log2(safe_r2)) + log2(log2(bailout));
             esc = true;
             break;
         }
