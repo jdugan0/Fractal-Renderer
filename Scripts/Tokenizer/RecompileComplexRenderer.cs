@@ -26,6 +26,11 @@ public partial class RecompileComplexRenderer : LineEdit
         {
             ReleaseFocus();
         }
+        if (Input.IsActionJustPressed("R")){
+            string func = starterFunctions[GD.Randi() % starterFunctions.Length];
+            Text = func;
+            recompile();
+        }
     }
 
     public void recompile()
