@@ -5,6 +5,10 @@ vec2 complexLn(vec2 a){
 	return vec2(log(length(a)),atan(a.y,a.x));
 }
 
+vec2 complexConjugate(vec2 a){
+	return vec2(a.x, -a.y);
+}
+
 vec2 complexAbs(vec2 a) {
 	return vec2(abs(a.x), abs(a.y));
 }

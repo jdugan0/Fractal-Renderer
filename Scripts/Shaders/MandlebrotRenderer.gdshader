@@ -32,20 +32,10 @@ void fragment(){
     float mu   = 0.0;
     bool esc   = false;
     const int MAX_ITERS = 250;
-	const int MIN_ITERS = 25;
 	vec2 last = z;
-	vec2 epsilon = vec2(1e-6);
-	vec2 lastPrime = (func(vec2(0.0) + epsilon,c) - func(vec2(0.0),c)) / epsilon;
 	float bailout = 256.0;
     for(int i=0;i<MAX_ITERS;i++){
         z = func(z, c);
-		vec2 d1 = z - last;
-		vec2 prime = (func(z + epsilon, c) - func(z,c)) / epsilon;
-		vec2 dprime = prime - lastPrime;
-		//if ((dot(d1,d1) < 1e-15) && i > MIN_ITERS){
-			//esc = false;
-			//break;
-		//}
 		vec2 delta = z - c;
         float r2 = dot(delta,delta);
         trap = min(trap, r2);
@@ -56,7 +46,6 @@ void fragment(){
             break;
         }
 		last = z;
-		lastPrime = prime;
     }
 
     if(!esc){ COLOR = vec4(0.0,0.0,0.0,1.0); }

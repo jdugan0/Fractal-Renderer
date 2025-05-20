@@ -147,7 +147,7 @@ namespace ExpressionToGLSL
                     tokens.Add(new Token(TokenType.Caret, "^"));
                     pos++;
                 }
-                else if (c == 'z' || c == 'Z')
+                else if ((c == 'z' || c == 'Z') && checkNextLetter(input, pos))
                 {
                     tokens.Add(new Token(TokenType.Z, "z"));
                     pos++;
@@ -155,6 +155,11 @@ namespace ExpressionToGLSL
                 else if ((c == 'c' || c == 'C') && useC && checkNextLetter(input, pos))
                 {
                     tokens.Add(new Token(TokenType.Z, "c"));
+                    pos++;
+                }
+                else if ((c == 'p' || c == 'P') && useC && checkNextLetter(input, pos))
+                {
+                    tokens.Add(new Token(TokenType.Z, "p"));
                     pos++;
                 }
                 else if (char.IsDigit(c) || c == '.' || c == 'i')
@@ -199,8 +204,14 @@ namespace ExpressionToGLSL
                         tokens.Add(new Token(TokenType.Identifier, "acos"));
                         pos += 4;
                     }
-                    else if (input.Substring(pos).ToLower().StartsWith("abs")){
+                    else if (input.Substring(pos).ToLower().StartsWith("abs"))
+                    {
                         tokens.Add(new Token(TokenType.Identifier, "abs"));
+                        pos += 3;
+                    }
+                    else if (input.Substring(pos).ToLower().StartsWith("bar"))
+                    {
+                        tokens.Add(new Token(TokenType.Identifier, "bar"));
                         pos += 3;
                     }
                     else
@@ -471,6 +482,8 @@ namespace ExpressionToGLSL
                         return $"complexAcos({argCode})";
                     case "abs":
                         return $"complexAbs({argCode})";
+                    case "bar":
+                        return $"complexConjugate({argCode})";
                     default:
                         throw new Exception($"Unknown function {FunctionName}");
                 }
