@@ -8,11 +8,15 @@ public partial class RecompileComplexRenderer : LineEdit
     [Export] bool useC;
     String oldCode;
     bool outside = true;
+
+    [Export] public string[] starterFunctions;
     public override void _Ready()
     {
         oldCode = shader.Shader.Code;
         MouseEntered += () => { outside = false; };
         MouseExited += () => { outside = true; };
+        string func = starterFunctions[GD.Randi() % starterFunctions.Length];
+        Text = func;
         recompile();
     }
     public override void _Process(double delta)

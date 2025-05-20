@@ -13,6 +13,12 @@ vec2 complexAbs(vec2 a) {
 	return vec2(abs(a.x), abs(a.y));
 }
 
+vec2 real(vec2 a) {
+	return vec2(a.x, 0.0);
+}
+vec2 imag(vec2 a) {
+	return vec2(a.y,0.0);
+}
 
 // z  => (x, y)
 // w  => (a, b)

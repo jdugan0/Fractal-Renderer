@@ -52,6 +52,7 @@ alignment = 1
 script = ExtResource("1_0s2d5")
 sprite = NodePath("../../../Sprite2D")
 shader = SubResource("ShaderMaterial_ouy2c")
+starterFunctions = PackedStringArray("((1/z)^18 - 1/z) / (1/z - 1)", "tan(ln(z))", "(z)!", "(z^7-1)/(z^7+1)", "(z-1)(z-i)(z+1)(z+i)", "ln(1+z^2)", "e^(1/z^2)")
 
 [node name="Button2" type="Button" parent="CanvasLayer/Control"]
 layout_mode = 1

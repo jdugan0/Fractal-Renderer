@@ -162,7 +162,7 @@ namespace ExpressionToGLSL
                     tokens.Add(new Token(TokenType.Z, "p"));
                     pos++;
                 }
-                else if (char.IsDigit(c) || c == '.' || c == 'i')
+                else if (char.IsDigit(c) || c == '.' || (c == 'i' && checkNextLetter(input, pos)))
                 {
                     // Parse a numeric literal, possibly with an 'i' for imaginary.
                     ParseNumberOrImag(input, ref pos, tokens);
@@ -213,6 +213,16 @@ namespace ExpressionToGLSL
                     {
                         tokens.Add(new Token(TokenType.Identifier, "bar"));
                         pos += 3;
+                    }
+                    else if (input.Substring(pos).ToLower().StartsWith("real"))
+                    {
+                        tokens.Add(new Token(TokenType.Identifier, "real"));
+                        pos += 4;
+                    }
+                    else if (input.Substring(pos).ToLower().StartsWith("imag"))
+                    {
+                        tokens.Add(new Token(TokenType.Identifier, "imag"));
+                        pos += 4;
                     }
                     else
                     {
@@ -484,6 +494,10 @@ namespace ExpressionToGLSL
                         return $"complexAbs({argCode})";
                     case "bar":
                         return $"complexConjugate({argCode})";
+                    case "real":
+                        return $"real({argCode})";
+                    case "imag":
+                        return $"imag({argCode})";
                     default:
                         throw new Exception($"Unknown function {FunctionName}");
                 }
