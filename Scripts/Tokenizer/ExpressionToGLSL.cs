@@ -199,6 +199,10 @@ namespace ExpressionToGLSL
                         tokens.Add(new Token(TokenType.Identifier, "acos"));
                         pos += 4;
                     }
+                    else if (input.Substring(pos).ToLower().StartsWith("abs")){
+                        tokens.Add(new Token(TokenType.Identifier, "abs"));
+                        pos += 3;
+                    }
                     else
                     {
                         throw new Exception($"unknown function at {pos}");
@@ -465,6 +469,8 @@ namespace ExpressionToGLSL
                         return $"complexGamma({argCode})";
                     case "acos":
                         return $"complexAcos({argCode})";
+                    case "abs":
+                        return $"complexAbs({argCode})";
                     default:
                         throw new Exception($"Unknown function {FunctionName}");
                 }
