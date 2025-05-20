@@ -33,6 +33,7 @@ public partial class PauseMenu : CanvasLayer
         }
         paused = !paused;
         Visible = !Visible;
+        HideOptions();
     }
 
     public void ShowOptions(){
