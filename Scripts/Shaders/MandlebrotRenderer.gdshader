@@ -23,34 +23,65 @@ vec3 blend_pal(float t, float trap){
     return mix1 * (0.6 + 0.4*glow);
 }
 
-void fragment(){
+void fragment() {
     vec2 res = vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y);
-    vec2 c = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x, UV.y/SCREEN_PIXEL_SIZE.y), res, zoomFactor, offset);
+    vec2 c   = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
+                              UV.y/SCREEN_PIXEL_SIZE.y),
+                         res, zoomFactor, offset);
 
-    vec2 z = func(vec2(0.0),c);
-    float trap = 1e20;
-    float mu   = 0.0;
-    bool esc   = false;
+    vec2 z = func(vec2(0.0), c);
+
+    float trap     = 1e20;
+    float mu       = 0.0;
+    bool  esc      = false;
+    bool  cycle    = false;
+
     const int MAX_ITERS = 300;
-	vec2 last = z;
-	float bailout = 128.0;
-    for(int i=0;i<MAX_ITERS;i++){ 
+    const int MIN_ITERS = 0;
+
+    float bailout  = 128.0;
+    float eps      = zoomFactor * 1e-4;   // tolerance for “same value”
+
+    vec2 tortoise  = z;  // reference point
+    int  power     = 1;  // when to move the reference
+    int  lam       = 0;  // distance travelled since last reset
+
+    for (int i = 0; i < MAX_ITERS; ++i) {
+
+        /* normal fractal iteration */
         z = func(z, c);
-		vec2 delta = z-c;
-        float r2 = dot(delta,delta);
-        trap = min(trap, r2);
-        if(r2 > bailout){
-			float safe_r2 = max(r2, 1.000001); 
-            mu = float(i) + 1.0 - log2(log2(safe_r2)) + log2(log2(bailout));
+
+
+        vec2 delta = z - c;
+        float r2   = dot(delta, delta);
+        trap       = min(trap, r2);
+
+
+        if (r2 > bailout && i > MIN_ITERS) {
+            float safe_r2 = max(r2, 1.000001);
+            mu  = float(i) + 1.0 - log2(log2(safe_r2)) + log2(log2(bailout));
             esc = true;
             break;
         }
-		last = z;
+
+
+        ++lam;
+        if (dot(z - tortoise, z - tortoise) < eps*eps) {
+            cycle = true;
+            break;              // found a repeat → interior / attractive cycle
+        }
+
+        if (lam == power) {     // time to shift the reference forward
+            tortoise = z;
+            power   <<= 1;      // power *= 2
+            lam      = 0;
+        }
     }
 
-    if(!esc){ COLOR = vec4(0.0,0.0,0.0,1.0); }
-    else{
+    if (!esc) {
+        COLOR = vec4(0.0, 0.0, 0.0, 1.0);
+    } else {
         float t = mu / float(MAX_ITERS);
-        COLOR = vec4(blend_pal(t, trap), 1.0);
+        COLOR   = vec4(blend_pal(t, trap), 1.0);
     }
 }

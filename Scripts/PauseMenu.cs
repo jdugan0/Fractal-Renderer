@@ -5,6 +5,8 @@ public partial class PauseMenu : CanvasLayer
 {
     [Export] public LineEdit textEdit;
     public bool paused = false;
+    [Export] Panel mainPause;
+    [Export] Panel options;
 
     public override void _Ready()
     {
@@ -30,6 +32,16 @@ public partial class PauseMenu : CanvasLayer
         }
         paused = !paused;
         Visible = !Visible;
+    }
+
+    public void ShowOptions(){
+        options.Show();
+        mainPause.Hide();
+    }
+
+    public void HideOptions(){
+        options.Hide();
+        mainPause.Show();
     }
 
     public void Menu()

@@ -19,7 +19,7 @@ vec2 complexAbs(vec2 a) {
 vec2 complex_pow_complex(vec2 z, vec2 w) {
     // Convert z to polar form: z = r e^{iθ}
     float r = length(z);              // sqrt(x^2 + y^2)
-    float theta = atan(z.y, z.x); 
+    float theta = atan(z.y, z.x);
 
     // w = a + i b
     float a = w.x;
