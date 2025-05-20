@@ -19,27 +19,15 @@ vec2 complexAbs(vec2 a) {
 vec2 complex_pow_complex(vec2 z, vec2 w) {
     // Convert z to polar form: z = r e^{iθ}
     float r = length(z);              // sqrt(x^2 + y^2)
-    float theta = atan(z.y, z.x); // or built-in atan2 if available
+    float theta = atan(z.y, z.x); 
 
     // w = a + i b
     float a = w.x;
     float b = w.y;
-
-    // We'll compute z^w = e^{w * ln(z)} = e^{(a + i b) * (ln(r) + iθ)}
-
-    // Real part of (a + i b) * (ln(r) + i θ) = a ln(r) - b θ
     float real_part = a * log(r + 1e-8) - b * theta;
-
-    // Imag part of (a + i b) * (ln(r) + i θ) = a θ + b ln(r)
     float imag_part = a * theta + b * log(r + 1e-8);
-
-    // e^{ real_part } is the magnitude
     float magnitude = exp(real_part);
-
-    // imag_part is the new angle
     float angle = imag_part;
-
-    // Finally convert from polar back to cartesian
     return vec2(
         magnitude * cos(angle),
         magnitude * sin(angle)
@@ -91,10 +79,6 @@ vec2 complexGammaLanczos(vec2 z) {
 
     // Summation part: x = p[0] + p[1]/(z+1) + p[2]/(z+2) + ...
     vec2 x = vec2(p[0], 0.0);
-
-    // We'll do i from 1..8
-    // NOTE: In Godot 4's shading language, for-loops with non-constant bounds
-    // might need special handling. If it doesn't compile, unroll it manually.
     for (int i = 1; i < 9; i++) {
         vec2 term = complexDivide(vec2(p[i], 0.0), z + vec2(float(i), 0.0));
         x = x+ term;
@@ -102,9 +86,6 @@ vec2 complexGammaLanczos(vec2 z) {
 
     // t = z + g + 0.5
     vec2 t = z+vec2(g + 0.5, 0.0);
-
-    // We do (t)^(z + 0.5) * e^(-t) * x * sqrt(2π)
-    // basePow = t^(z + 0.5)
     vec2 exponent = (z+ vec2(0.5, 0.0));
     vec2 basePow  = complex_pow_complex(t, exponent);
 
@@ -120,15 +101,6 @@ vec2 complexGammaLanczos(vec2 z) {
 
     return y;
 }
-
-//------------------------------------------------------------------------------
-// 4) Shifting Approach: "complexGamma"
-//
-//    If Re(z) >= 0.5, use Lanczos directly.
-//    Else shift z in integer steps so that Re(z + n) >= 0.5.
-//    Then use the identity:
-//       Γ(z) = Γ(z + n) / [z*(z+1)*...*(z + n - 1)]
-//------------------------------------------------------------------------------
 vec2 complexProductRange(vec2 z, int n) {
     // multiply (z + 0)*(z + 1)*...*(z + n -1)
     vec2 result = vec2(1.0, 0.0);
@@ -139,7 +111,6 @@ vec2 complexProductRange(vec2 z, int n) {
     return result;
 }
 
-// The main function that the user calls
 vec2 complexGamma(vec2 z) {
     float re_z = z.x;  // real part of z
 
