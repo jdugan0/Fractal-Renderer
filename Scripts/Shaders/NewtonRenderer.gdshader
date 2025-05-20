@@ -23,7 +23,7 @@ void fragment(){
 		}
 		prime = complexMult(result,prime);
 		newC = newC - complexDivide(result, prime);
-		if (length(result) < 1e-3){
+		if (length(result) < 1e-4){
 			break;
 		}
 		 // using analytical derivative NOT numerical

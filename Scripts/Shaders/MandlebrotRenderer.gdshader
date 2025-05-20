@@ -28,20 +28,20 @@ void fragment(){
     vec2 c = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x, UV.y/SCREEN_PIXEL_SIZE.y), res, zoomFactor, offset);
 
     vec2 z = func(vec2(0.0),c);
-    float trap = 1e10;
+    float trap = 1e20;
     float mu   = 0.0;
     bool esc   = false;
-    const int MAX_ITERS = 250;
+    const int MAX_ITERS = 300;
 	vec2 last = z;
-	float bailout = 256.0;
-    for(int i=0;i<MAX_ITERS;i++){
+	float bailout = 128.0;
+    for(int i=0;i<MAX_ITERS;i++){ 
         z = func(z, c);
-		vec2 delta = z - c;
+		vec2 delta = z-c;
         float r2 = dot(delta,delta);
         trap = min(trap, r2);
         if(r2 > bailout){
 			float safe_r2 = max(r2, 1.000001); 
-            mu = float(i) - log2(log2(safe_r2)) + log2(log2(bailout));
+            mu = float(i) + 1.0 - log2(log2(safe_r2)) + log2(log2(bailout));
             esc = true;
             break;
         }
