@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://4ps2lq1e6o73"]
+[gd_scene load_steps=6 format=3 uid="uid://4ps2lq1e6o73"]
 
 [ext_resource type="Shader" uid="uid://dl7afeptw68kh" path="res://Scripts/Shaders/NewtonRenderer.gdshader" id="2_xetub"]
 [ext_resource type="PackedScene" uid="uid://nd83sbyol6gj" path="res://Scenes/pause.tscn" id="3_br55d"]
 [ext_resource type="Script" uid="uid://duel8ovby28tx" path="res://Scripts/ShaderHelpers/NewtonRenderer.cs" id="3_xetub"]
+[ext_resource type="Script" uid="uid://bwsm752h8ax3e" path="res://Scripts/UIManager.cs" id="4_vyh1m"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8cjuv"]
 shader = ExtResource("2_xetub")
@@ -27,7 +28,9 @@ pauseMenu = NodePath("../Pause")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("pauseMenu")]
+script = ExtResource("4_vyh1m")
+pauseMenu = NodePath("../Pause")
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 layout_mode = 3

@@ -1,6 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://ca41xtr4e0rvs"]
+[gd_scene load_steps=10 format=3 uid="uid://ca41xtr4e0rvs"]
 
 [ext_resource type="Script" uid="uid://bx3qv3e3o08mn" path="res://Scripts/Tokenizer/RecompileComplexRenderer.cs" id="1_0s2d5"]
+[ext_resource type="Script" uid="uid://bwsm752h8ax3e" path="res://Scripts/UIManager.cs" id="1_8cjuv"]
 [ext_resource type="Shader" uid="uid://bb010k416ytxw" path="res://Scripts/Shaders/ComplexRenderer.gdshader" id="2_ochr1"]
 [ext_resource type="Script" uid="uid://dmip8rkr5pujv" path="res://Scripts/ShaderHelpers/ComplexRenderer.cs" id="3_ouy2c"]
 [ext_resource type="PackedScene" uid="uid://nd83sbyol6gj" path="res://Scenes/pause.tscn" id="4_ouy2c"]
@@ -27,7 +28,9 @@ shader_parameter/prime = false
 
 [node name="ComplexRenderer" type="Node2D"]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("pauseMenu")]
+script = ExtResource("1_8cjuv")
+pauseMenu = NodePath("../Pause")
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 layout_mode = 3

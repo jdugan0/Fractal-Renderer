@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://nd83sbyol6gj"]
+[gd_scene load_steps=3 format=3 uid="uid://nd83sbyol6gj"]
 
 [ext_resource type="Script" uid="uid://csfn0a6h1vhpf" path="res://Scripts/PauseMenu.cs" id="1_o80xk"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o80xk"]
+bg_color = Color(0.890196, 0.45098, 0.403922, 0.796078)
 
 [node name="Pause" type="CanvasLayer" node_paths=PackedStringArray("mainPause", "options")]
 script = ExtResource("1_o80xk")
@@ -16,6 +19,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Pause" type="Panel" parent="Control"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -56,7 +60,6 @@ theme_override_font_sizes/font_size = 151
 text = "MENU"
 
 [node name="Options" type="Panel" parent="Control"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -64,7 +67,38 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/Options"]
+custom_minimum_size = Vector2(0, 1000)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -313.5
+offset_top = -329.5
+offset_right = 313.5
+offset_bottom = 329.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 80
+alignment = 1
+
+[node name="HIDE" type="Button" parent="Control/Options/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 151
+theme_override_styles/pressed = SubResource("StyleBoxFlat_o80xk")
+toggle_mode = true
+text = "HIDE UI"
+
+[node name="Back" type="Button" parent="Control/Options/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 151
+text = "BACK"
+
 [connection signal="pressed" from="Control/Pause/VBoxContainer/Button" to="." method="TogglePause"]
 [connection signal="pressed" from="Control/Pause/VBoxContainer/Button2" to="." method="ShowOptions"]
 [connection signal="pressed" from="Control/Pause/VBoxContainer/Button3" to="." method="Menu"]
 [connection signal="pressed" from="Control/Pause/VBoxContainer/Button3" to="Control" method="Menu"]
+[connection signal="toggled" from="Control/Options/VBoxContainer/HIDE" to="." method="toggleUI"]
+[connection signal="pressed" from="Control/Options/VBoxContainer/Back" to="." method="HideOptions"]

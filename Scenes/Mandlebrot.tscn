@@ -1,6 +1,7 @@
-[gd_scene load_steps=7 format=3 uid="uid://dcspvvrkh8pwn"]
+[gd_scene load_steps=8 format=3 uid="uid://dcspvvrkh8pwn"]
 
 [ext_resource type="Script" uid="uid://bx3qv3e3o08mn" path="res://Scripts/Tokenizer/RecompileComplexRenderer.cs" id="1_pbp4u"]
+[ext_resource type="Script" uid="uid://bwsm752h8ax3e" path="res://Scripts/UIManager.cs" id="1_q24fa"]
 [ext_resource type="Shader" uid="uid://clp201l25q53r" path="res://Scripts/Shaders/MandlebrotRenderer.gdshader" id="2_lo45j"]
 [ext_resource type="PackedScene" uid="uid://nd83sbyol6gj" path="res://Scenes/pause.tscn" id="3_lo45j"]
 [ext_resource type="Script" uid="uid://bqq240yvtkv3b" path="res://Scripts/ShaderHelpers/MandlebrotRenderer.cs" id="4_pbp4u"]
@@ -17,7 +18,9 @@ shader_parameter/zoomFactor = 0.0
 
 [node name="ComplexRenderer" type="Node2D"]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="CanvasLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("pauseMenu")]
+script = ExtResource("1_q24fa")
+pauseMenu = NodePath("../Pause")
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 layout_mode = 3

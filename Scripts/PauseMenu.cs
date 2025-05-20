@@ -7,6 +7,7 @@ public partial class PauseMenu : CanvasLayer
     public bool paused = false;
     [Export] Panel mainPause;
     [Export] Panel options;
+    public bool UI = false;
 
     public override void _Ready()
     {
@@ -44,6 +45,9 @@ public partial class PauseMenu : CanvasLayer
         mainPause.Show();
     }
 
+    public void toggleUI(bool toggle){
+        UI = toggle;
+    }
     public void Menu()
     {
         SceneSwitcher.instance.SwitchScene(0);
