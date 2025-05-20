@@ -7,6 +7,13 @@ public partial class NewtonRenderer : ViewBase
     List<Vector2> roots = new List<Vector2>();
     int color = 0;
     bool hover = false;
+    public override void _Ready()
+    {
+        base._Ready();
+        roots.Add(new Vector2(0, 0));
+        roots.Add(new Vector2(0, 1));
+        roots.Add(new Vector2(1, 0));
+    }
     public override void _UnhandledInput(InputEvent @event)
     {
         if (pauseMenu.paused)
@@ -23,12 +30,24 @@ public partial class NewtonRenderer : ViewBase
         {
 
             int id = findClosest();
-            if (id != -1)
+            if (id != -1 && roots.Count > 1)
             {
                 roots.RemoveAt(id);
             }
         }
-        if (@event.IsActionPressed("RightClick"))
+
+    }
+
+    public override void HandleInput(double delta)
+    {
+        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
+        Vector2 scale = (mouse / _w / zoom) + offset;
+        base.HandleInput(delta);
+        if (pauseMenu.paused)
+        {
+            return;
+        }
+        if (Input.IsActionPressed("RightClick"))
         {
             int id = findClosest();
             if (id != -1)
