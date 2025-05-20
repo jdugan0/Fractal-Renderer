@@ -22,6 +22,9 @@ vec3 blend_pal(float t, float trap){
     float glow = clamp(1.0 - pow(trap / 256.0, 0.25), 0.0, 1.0);
     return mix1 * (0.6 + 0.4*glow);
 }
+bool non_finite(vec2 v) {
+    return any(isnan(v)) || any(isinf(v));
+}
 
 void fragment() {
     vec2 res = vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y);
@@ -37,10 +40,11 @@ void fragment() {
     bool  cycle    = false;
 
     const int MAX_ITERS = 300;
-    const int MIN_ITERS = 0;
+    const int MIN_ITERS = 25;
+	bool mu_lock = false;
 
-    float bailout  = 128.0;
-    float eps      = zoomFactor * 1e-4;   // tolerance for “same value”
+    float bailout  = 256.0;
+    float eps = 1e-4 / zoomFactor;   // tolerance for “same value”
 
     vec2 tortoise  = z;  // reference point
     int  power     = 1;  // when to move the reference
@@ -56,12 +60,25 @@ void fragment() {
         float r2   = dot(delta, delta);
         trap       = min(trap, r2);
 
+		if (non_finite(z)) {
+	        esc = true;
+	        if (!mu_lock) {
+				mu  = float(i);
+			}
+	        break;
+    	}
 
-        if (r2 > bailout && i > MIN_ITERS) {
-            float safe_r2 = max(r2, 1.000001);
-            mu  = float(i) + 1.0 - log2(log2(safe_r2)) + log2(log2(bailout));
-            esc = true;
-            break;
+
+        if (r2 > bailout) {
+            if (!mu_lock){
+				float safe_r2 = max(r2, 1.000001);
+            	mu  = float(i) + 1.0 - log2(log2(safe_r2)) + log2(log2(bailout));
+				mu_lock = true;
+			}
+            if (i > MIN_ITERS){
+				esc = true;
+            	break;
+			}
         }
 
 
@@ -80,6 +97,9 @@ void fragment() {
 
     if (!esc) {
         COLOR = vec4(0.0, 0.0, 0.0, 1.0);
+		//if (cycle){
+			//COLOR = vec4(1.0, 1.0, 1.0, 1.0);
+		//}
     } else {
         float t = mu / float(MAX_ITERS);
         COLOR   = vec4(blend_pal(t, trap), 1.0);
