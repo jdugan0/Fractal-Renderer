@@ -26,7 +26,8 @@ public partial class RecompileComplexRenderer : LineEdit
         {
             ReleaseFocus();
         }
-        if (Input.IsActionJustPressed("R")){
+        if (Input.IsActionJustPressed("R") && !HasFocus())
+        {
             string func = starterFunctions[GD.Randi() % starterFunctions.Length];
             Text = func;
             recompile();

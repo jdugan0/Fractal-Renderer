@@ -39,7 +39,7 @@ void fragment() {
     bool  esc      = false;
     bool  cycle    = false;
 
-    const int MAX_ITERS = 300;
+    const int MAX_ITERS = 500;
     const int MIN_ITERS = 25;
 	bool mu_lock = false;
 
