@@ -5,6 +5,9 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Linq.Expressions;
 using System.Reflection;
+using Meta.Numerics.Functions;
+using MNComplex = Meta.Numerics.Complex;
+
 
 namespace ExpressionToGLSL
 {
@@ -20,6 +23,19 @@ namespace ExpressionToGLSL
             binder: null,
             types: new[] { typeof(Complex), typeof(Complex) },
             modifiers: null)!;
+        static readonly MethodInfo GammaMN =
+typeof(AdvancedComplexMath).GetMethod(
+    nameof(AdvancedComplexMath.Gamma),
+    BindingFlags.Public | BindingFlags.Static,
+    binder: null,
+    types: new[] { typeof(MNComplex) },
+    modifiers: null)!;
+        static Expression ToMN(Expression e) =>
+        Expression.Convert(e, typeof(MNComplex));
+
+        // Meta.Numerics.Complex    ->  System.Numerics.Complex
+        static Expression ToSys(Expression e) =>
+            Expression.Convert(e, typeof(Complex));
         static readonly MethodInfo MathAbs =
 typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
 
@@ -535,6 +551,7 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
 
                 return FunctionName.ToLowerInvariant() switch
                 {
+                    "!" => ToSys(Expression.Call(GammaMN, ToMN(arg))),
                     "ln" => Call(nameof(Complex.Log)),
                     "sin" => Call(nameof(Complex.Sin)),
                     "cos" => Call(nameof(Complex.Cos)),
@@ -566,12 +583,6 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
 
                 MethodCallExpression Call(string method)
                     => Expression.Call(typeof(Complex).GetMethod(method, new[] { typeof(Complex) })!, arg);
-
-                Expression ToComplex(Expression real)
-                {
-                    var ctor = typeof(Complex).GetConstructor(new[] { typeof(double), typeof(double) });
-                    return Expression.New(ctor!, real, Expression.Constant(0.0));
-                }
             }
 
         }

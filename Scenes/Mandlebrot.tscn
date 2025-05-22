@@ -60,6 +60,7 @@ visible = false
 textEdit = NodePath("../CanvasLayer/Control/LineEdit")
 
 [node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("TextEdit", "pauseMenu")]
+visible = false
 texture_filter = 1
 material = SubResource("ShaderMaterial_8cjuv")
 script = ExtResource("4_pbp4u")

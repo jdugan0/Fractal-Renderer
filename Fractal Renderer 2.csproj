@@ -4,4 +4,7 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>FractalRenderer2</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Meta.Numerics" Version="4.1.4" />
+  </ItemGroup>
 </Project>
