@@ -19,9 +19,6 @@ shader_parameter/zoomFactor = 0.0
 
 [node name="ComplexRenderer" type="Node2D"]
 
-[node name="Plotter" type="Node2D" parent="."]
-script = ExtResource("4_lo45j")
-
 [node name="CanvasLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("pauseMenu")]
 script = ExtResource("1_q24fa")
 pauseMenu = NodePath("../Pause")
@@ -60,7 +57,6 @@ visible = false
 textEdit = NodePath("../CanvasLayer/Control/LineEdit")
 
 [node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("TextEdit", "pauseMenu")]
-visible = false
 texture_filter = 1
 material = SubResource("ShaderMaterial_8cjuv")
 script = ExtResource("4_pbp4u")
@@ -68,5 +64,8 @@ TextEdit = NodePath("../CanvasLayer/Control/LineEdit")
 pauseMenu = NodePath("../Pause")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Plotter" type="Node2D" parent="."]
+script = ExtResource("4_lo45j")
 
 [connection signal="text_changed" from="CanvasLayer/Control/LineEdit" to="CanvasLayer/Control/LineEdit" method="recompile"]
