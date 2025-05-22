@@ -39,12 +39,12 @@ void fragment() {
     bool  esc      = false;
     bool  cycle    = false;
 
-    const int MAX_ITERS = 500;
-    const int MIN_ITERS = 25;
+    const int MAX_ITERS = 250;
+    const int MIN_ITERS = -1;
 	bool mu_lock = false;
 
     float bailout  = 256.0;
-    float eps = 1e-4 / zoomFactor;   // tolerance for “same value”
+    float eps = 1e-5;   // tolerance for “same value”
 
     vec2 tortoise  = z;  // reference point
     int  power     = 1;  // when to move the reference
@@ -71,7 +71,7 @@ void fragment() {
 
         if (r2 > bailout) {
             if (!mu_lock){
-				float safe_r2 = max(r2, 1.000001);
+				float safe_r2 = max(sqrt(r2), 1.000001);
             	mu  = float(i) + 1.0 - log2(log2(safe_r2)) + log2(log2(bailout));
 				mu_lock = true;
 			}
