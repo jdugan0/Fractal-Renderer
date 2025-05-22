@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://dcspvvrkh8pwn"]
+[gd_scene load_steps=9 format=3 uid="uid://dcspvvrkh8pwn"]
 
 [ext_resource type="Script" uid="uid://bx3qv3e3o08mn" path="res://Scripts/Tokenizer/RecompileComplexRenderer.cs" id="1_pbp4u"]
 [ext_resource type="Script" uid="uid://bwsm752h8ax3e" path="res://Scripts/UIManager.cs" id="1_q24fa"]
 [ext_resource type="Shader" uid="uid://clp201l25q53r" path="res://Scripts/Shaders/MandlebrotRenderer.gdshader" id="2_lo45j"]
 [ext_resource type="PackedScene" uid="uid://nd83sbyol6gj" path="res://Scenes/pause.tscn" id="3_lo45j"]
+[ext_resource type="Script" uid="uid://rv1fvuwi3gr7" path="res://Scripts/ShaderHelpers/Plotter.cs" id="4_lo45j"]
 [ext_resource type="Script" uid="uid://bqq240yvtkv3b" path="res://Scripts/ShaderHelpers/MandlebrotRenderer.cs" id="4_pbp4u"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pbp4u"]
@@ -18,6 +19,9 @@ shader_parameter/zoomFactor = 0.0
 
 [node name="ComplexRenderer" type="Node2D"]
 
+[node name="Plotter" type="Node2D" parent="."]
+script = ExtResource("4_lo45j")
+
 [node name="CanvasLayer" type="CanvasLayer" parent="." node_paths=PackedStringArray("pauseMenu")]
 script = ExtResource("1_q24fa")
 pauseMenu = NodePath("../Pause")
@@ -29,8 +33,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+metadata/_edit_use_anchors_ = true
 
-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/Control" node_paths=PackedStringArray("sprite")]
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/Control" node_paths=PackedStringArray("sprite", "pauseMenu", "mandlebrotRenderer", "plotter")]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -43,7 +48,11 @@ script = ExtResource("1_pbp4u")
 sprite = NodePath("../../../Sprite2D")
 shader = SubResource("ShaderMaterial_pbp4u")
 useC = true
+pauseMenu = NodePath("../../../Pause")
+mandlebrotRenderer = NodePath("../../../Sprite2D")
 starterFunctions = PackedStringArray("z^2+c", "bar(z)^2+c", "abs(z)^2+c", "i^z + c", "z^5+c", "abs(real(z^2))+i*imag(z^2)+c", "abs(real(z^2))+i*abs(imag(z^2))+c", "z^(z+c)")
+plotter = NodePath("../../../Plotter")
+metadata/_edit_use_anchors_ = true
 
 [node name="Pause" parent="." node_paths=PackedStringArray("textEdit") instance=ExtResource("3_lo45j")]
 layer = 96

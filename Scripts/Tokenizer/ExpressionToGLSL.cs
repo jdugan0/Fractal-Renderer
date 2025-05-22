@@ -1,13 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.InteropServices;
-using Godot;
+using System.Linq.Expressions;
+using System.Reflection;
 
 namespace ExpressionToGLSL
 {
+
     public static class ExpressionParser
     {
+
+        static readonly ConstructorInfo ComplexCtor =
+    typeof(Complex).GetConstructor(new[] { typeof(double), typeof(double) });
+        static readonly MethodInfo PowCC = typeof(Complex).GetMethod(
+            nameof(Complex.Pow),
+            BindingFlags.Public | BindingFlags.Static,
+            binder: null,
+            types: new[] { typeof(Complex), typeof(Complex) },
+            modifiers: null)!;
+        static readonly MethodInfo MathAbs =
+typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
+
         /// <summary>
         /// Convert a user-typed expression like "(1/z)^18 + z^3"
         /// </summary>
@@ -31,6 +46,18 @@ namespace ExpressionToGLSL
 
             // 3) Convert the AST to GLSL code
             return ast.ToGlsl();
+        }
+
+        public static Func<Complex, Complex, Complex> CompileToFunc(
+        string expression, bool useC = false)
+        {
+            var tokens = Tokenize(expression, useC);
+            var ast = new Parser(tokens).ParseExpression();
+            var zParam = Expression.Parameter(typeof(Complex), "z");
+            var cParam = Expression.Parameter(typeof(Complex), "c");
+            Expression body = ast.ToExpression(zParam, cParam);
+            return Expression.Lambda<Func<Complex, Complex, Complex>>(body, zParam, cParam)
+                             .Compile();
         }
 
         #region Tokenization
@@ -92,7 +119,6 @@ namespace ExpressionToGLSL
             while (pos < input.Length)
             {
                 char c = input[pos];
-
                 if (char.IsWhiteSpace(c))
                 {
                     // Ignore whitespace
@@ -191,12 +217,12 @@ namespace ExpressionToGLSL
                     }
                     else if (input.Substring(pos).ToLower().StartsWith("e"))
                     {
-                        tokens.Add(new Token(TokenType.Number, Mathf.E.ToString()));
+                        tokens.Add(new Token(TokenType.Number, Math.E.ToString()));
                         pos += 1;
                     }
                     else if (input.Substring(pos).ToLower().StartsWith("pi"))
                     {
-                        tokens.Add(new Token(TokenType.Number, Mathf.Pi.ToString()));
+                        tokens.Add(new Token(TokenType.Number, Math.PI.ToString()));
                         pos += 2;
                     }
                     else if (input.Substring(pos).ToLower().StartsWith("acos"))
@@ -502,6 +528,52 @@ namespace ExpressionToGLSL
                         throw new Exception($"Unknown function {FunctionName}");
                 }
             }
+
+            public override Expression ToExpression(ParameterExpression z, ParameterExpression c)
+            {
+                var arg = Argument.ToExpression(z, c);
+
+                return FunctionName.ToLowerInvariant() switch
+                {
+                    "ln" => Call(nameof(Complex.Log)),
+                    "sin" => Call(nameof(Complex.Sin)),
+                    "cos" => Call(nameof(Complex.Cos)),
+                    "tan" => Call(nameof(Complex.Tan)),
+                    "abs" => absCC(arg),
+                    "bar" => Call(nameof(Complex.Conjugate)),
+                    "real" => Expression.New(typeof(Complex)
+                               .GetConstructor(new[] { typeof(double), typeof(double) }),
+                               Expression.PropertyOrField(arg, "Real"),
+                               Expression.Constant(0.0)),
+                    "imag" => Expression.New(typeof(Complex)
+                               .GetConstructor(new[] { typeof(double), typeof(double) }),
+                               Expression.PropertyOrField(arg, "Imaginary"),
+                               Expression.Constant(0.0)),
+                    _ => throw new NotSupportedException($"func {FunctionName}")
+                };
+
+                Expression absCC(Expression arg)
+                {
+                    var real = Expression.Property(arg, nameof(Complex.Real));
+                    var imag = Expression.Property(arg, nameof(Complex.Imaginary));
+                    var absReal = Expression.Call(MathAbs, real);
+                    var absImag = Expression.Call(MathAbs, imag);
+
+                    // new Complex(|Re|, |Im|)
+                    return Expression.New(ComplexCtor, absReal, absImag);
+                }
+
+
+                MethodCallExpression Call(string method)
+                    => Expression.Call(typeof(Complex).GetMethod(method, new[] { typeof(Complex) })!, arg);
+
+                Expression ToComplex(Expression real)
+                {
+                    var ctor = typeof(Complex).GetConstructor(new[] { typeof(double), typeof(double) });
+                    return Expression.New(ctor!, real, Expression.Constant(0.0));
+                }
+            }
+
         }
 
 
@@ -511,6 +583,7 @@ namespace ExpressionToGLSL
         private abstract class AstNode
         {
             public abstract string ToGlsl();
+            public abstract Expression ToExpression(ParameterExpression z, ParameterExpression c);
         }
         private class AstUnaryOp : AstNode
         {
@@ -532,6 +605,18 @@ namespace ExpressionToGLSL
                 }
                 return _child.ToGlsl();
             }
+
+            public override Expression ToExpression(ParameterExpression z, ParameterExpression c)
+            {
+                var child = _child.ToExpression(z, c);
+                return _isNegative
+                    ? Expression.Multiply(
+                          Expression.Constant(new Complex(-1, 0)),   // keep types consistent
+                          child)
+                    : child;
+            }
+
+
         }
         private class AstNumber : AstNode
         {
@@ -560,6 +645,21 @@ namespace ExpressionToGLSL
                     return $"vec2({Value.ToString("G", CultureInfo.InvariantCulture)}, 0.0)";
                 }
             }
+            public override Expression ToExpression(ParameterExpression z, ParameterExpression c)
+            {
+                Complex value;
+                if (IsImag)
+                {
+                    // e.g. "2.5i" => vec2(0.0, 2.5)
+                    value = new Complex(0, Value);
+                }
+                else
+                {
+                    // e.g. "3.14" => vec2(3.14, 0.0)
+                    value = new Complex(Value, 0);
+                }
+                return Expression.Constant(value, typeof(Complex));
+            }
         }
 
         /// <summary>
@@ -577,6 +677,13 @@ namespace ExpressionToGLSL
             {
                 return character;
             }
+            public override Expression ToExpression(ParameterExpression z, ParameterExpression c)
+                => character switch
+                {
+                    "z" => z,
+                    "c" => c,
+                    _ => throw new NotSupportedException($"unknown var {character}")
+                };
         }
 
         private enum BinOpType { Add, Subtract, Multiply, Divide, Power }
@@ -591,6 +698,22 @@ namespace ExpressionToGLSL
                 _left = left;
                 _right = right;
                 _op = op;
+            }
+            public override Expression ToExpression(ParameterExpression z, ParameterExpression c)
+            {
+                var L = _left.ToExpression(z, c);
+                var R = _right.ToExpression(z, c);
+                return _op switch
+                {
+                    BinOpType.Add => Expression.Add(L, R),
+                    BinOpType.Subtract => Expression.Subtract(L, R),
+                    BinOpType.Multiply => Expression.Multiply(L, R),
+                    BinOpType.Divide => Expression.Divide(L, R),
+                    BinOpType.Power => Expression.Call(PowCC, L, R),
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+
             }
 
             public override string ToGlsl()

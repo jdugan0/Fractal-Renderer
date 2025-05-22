@@ -5,8 +5,8 @@ using System;
 public partial class ViewBase : Sprite2D
 {
     [Export] public float speed = 1f;
-    protected Vector2 offset = Vector2.Zero;
-    protected float zoom = 0.1f;
+    public Vector2 offset = Vector2.Zero;
+    public float zoom = 0.1f;
 
     [Export] public PauseMenu pauseMenu;
 
