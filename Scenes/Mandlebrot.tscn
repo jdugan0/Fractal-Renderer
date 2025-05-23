@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dcspvvrkh8pwn"]
+[gd_scene load_steps=10 format=3 uid="uid://dcspvvrkh8pwn"]
 
 [ext_resource type="Script" uid="uid://bx3qv3e3o08mn" path="res://Scripts/Tokenizer/RecompileComplexRenderer.cs" id="1_pbp4u"]
 [ext_resource type="Script" uid="uid://bwsm752h8ax3e" path="res://Scripts/UIManager.cs" id="1_q24fa"]
@@ -13,6 +13,9 @@ shader_parameter/offset = Vector2(0, 0)
 shader_parameter/zoomFactor = 0.1
 shader_parameter/juliaPoint = Vector2(0, 0)
 shader_parameter/julia = false
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lo45j"]
+bg_color = Color(0.647059, 0.701961, 0.776471, 0.780392)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8cjuv"]
 shader = ExtResource("2_lo45j")
@@ -34,7 +37,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-metadata/_edit_use_anchors_ = true
 
 [node name="LineEdit" type="LineEdit" parent="CanvasLayer/Control" node_paths=PackedStringArray("sprite", "pauseMenu")]
 layout_mode = 1
@@ -53,18 +55,36 @@ pauseMenu = NodePath("../../../Pause")
 starterFunctions = PackedStringArray("z^2+c", "bar(z)^2+c", "abs(z)^2+c", "i^z + c", "z^5+c", "abs(real(z^2))+i*imag(z^2)+c", "abs(real(z^2))+i*abs(imag(z^2))+c", "z^(z+c)")
 metadata/_edit_use_anchors_ = true
 
+[node name="Button" type="Button" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -296.0
+offset_top = -52.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lo45j")
+toggle_mode = true
+text = "JULIA SETS "
+
 [node name="Pause" parent="." node_paths=PackedStringArray("textEdit") instance=ExtResource("3_lo45j")]
 layer = 96
 visible = false
 textEdit = NodePath("../CanvasLayer/Control/LineEdit")
 
-[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("TextEdit", "plotter", "compiler", "pauseMenu")]
+[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("TextEdit", "plotter", "compiler", "juliaBox", "pauseMenu")]
 texture_filter = 1
 material = SubResource("ShaderMaterial_8cjuv")
 script = ExtResource("4_pbp4u")
 TextEdit = NodePath("../CanvasLayer/Control/LineEdit")
 plotter = NodePath("../Plotter")
 compiler = NodePath("../CanvasLayer/Control/LineEdit")
+juliaBox = NodePath("../CanvasLayer/Control/Button")
 pauseMenu = NodePath("../Pause")
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -73,3 +93,4 @@ pauseMenu = NodePath("../Pause")
 script = ExtResource("4_lo45j")
 
 [connection signal="text_changed" from="CanvasLayer/Control/LineEdit" to="CanvasLayer/Control/LineEdit" method="recompile"]
+[connection signal="toggled" from="CanvasLayer/Control/Button" to="Sprite2D" method="ToggleJulia"]

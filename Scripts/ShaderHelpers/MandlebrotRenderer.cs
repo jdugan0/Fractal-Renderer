@@ -14,6 +14,8 @@ public partial class MandlebrotRenderer : ViewBase
     [Export] public int plotterIterations = 250;
     [Export] public Plotter plotter;
     [Export] public RecompileComplexRenderer compiler;
+    [Export] public Button juliaBox;
+    bool juliaFromBox;
 
     public override void HandleInput(double delta)
     {
@@ -21,13 +23,17 @@ public partial class MandlebrotRenderer : ViewBase
         {
             return;
         }
+        if (!julia){
+            juliaFromBox = false;
+        }
         if (Input.IsActionJustPressed("RightClick"))
         {
             julia = !julia;
+            juliaBox.SetPressedNoSignal(julia);
         }
         Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
         Vector2 scale = (mouse / _w / zoom) + offset;
-        if (Input.IsActionPressed("RightClick"))
+        if (Input.IsActionPressed("RightClick") || juliaFromBox)
         {
             juliaPoint = scale;
         }
@@ -58,6 +64,12 @@ public partial class MandlebrotRenderer : ViewBase
             plotter.SetPoints(new List<Vector2>());
         }
         base.HandleInput(delta);
+    }
+
+    public void ToggleJulia(bool toggle){
+
+        julia = toggle;
+        juliaFromBox = true;
     }
     public override void PushUniforms()
     {
