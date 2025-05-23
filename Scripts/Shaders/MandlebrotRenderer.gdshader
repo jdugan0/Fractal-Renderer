@@ -3,6 +3,9 @@ shader_type canvas_item;
 uniform vec2 offset = vec2(0.0,0.0);
 uniform float zoomFactor = 0.1;
 
+uniform vec2 juliaPoint = vec2(0.0, 0.0);
+uniform bool julia = false;
+
 
 vec2 func(vec2 z, vec2 c) {
 	vec2 result = vec2(0.00);
@@ -31,9 +34,13 @@ void fragment() {
     vec2 c   = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
                               UV.y/SCREEN_PIXEL_SIZE.y),
                          res, zoomFactor, offset);
+	vec2 start = vec2(0.0, 0.0);			
+	if (julia) {
+		start = c;
+		c = juliaPoint;
+	}
+    vec2 z = func(start, c);
 
-    vec2 z = func(vec2(0.0), c);
-	
     float trap     = 1e20;
     float mu       = 0.0;
     bool  esc      = false;
@@ -58,7 +65,7 @@ void fragment() {
 		count = i;
         /* normal fractal iteration */
         z = func(z, c);
-		
+
 		if (length(z - z_prev) < eps) {
             cycle = true;
             break;
