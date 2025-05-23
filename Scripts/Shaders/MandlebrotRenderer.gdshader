@@ -33,14 +33,14 @@ void fragment() {
                          res, zoomFactor, offset);
 
     vec2 z = func(vec2(0.0), c);
-
+	
     float trap     = 1e20;
     float mu       = 0.0;
     bool  esc      = false;
     bool  cycle    = false;
 
     const int MAX_ITERS = 250;
-    const int MIN_ITERS = -1;
+    const int MIN_ITERS = 20;
 	bool mu_lock = false;
 
     float bailout  = 256.0;
@@ -49,20 +49,27 @@ void fragment() {
     vec2 tortoise  = z;  // reference point
     int  power     = 1;  // when to move the reference
     int  lam       = 0;  // distance travelled since last reset
+	int count;
+	const int PERIOD = 20;
+	vec2 z_prev = z;
+	int pcount = 0;
 
     for (int i = 0; i < MAX_ITERS; ++i) {
-
+		count = i;
         /* normal fractal iteration */
         z = func(z, c);
-
-
+		
+		if (length(z - z_prev) < eps) {
+            cycle = true;
+            break;
+        }
         vec2 delta = z - c;
         float r2   = dot(delta, delta);
         trap       = min(trap, r2);
 
 		if (non_finite(z)) {
 	        esc = true;
-	        if (!mu_lock) {
+	        if (!mu_lock){
 				mu  = float(i);
 			}
 	        break;
@@ -70,14 +77,14 @@ void fragment() {
 
 
         if (r2 > bailout) {
-            if (!mu_lock){
+			if (!mu_lock){
 				float safe_r2 = max(sqrt(r2), 1.000001);
-            	mu  = float(i) + 1.0 - log2(log2(safe_r2)) + log2(log2(bailout));
+           		mu  = float(i) + 1.0 - log2(log2(safe_r2)) / log(2);
 				mu_lock = true;
 			}
-            if (i > MIN_ITERS){
+			if (i > MIN_ITERS){
 				esc = true;
-            	break;
+           		break;
 			}
         }
 
@@ -93,6 +100,7 @@ void fragment() {
             power   <<= 1;      // power *= 2
             lam      = 0;
         }
+		z_prev = z;
     }
 
     if (!esc) {
@@ -104,4 +112,5 @@ void fragment() {
         float t = mu / float(MAX_ITERS);
         COLOR   = vec4(blend_pal(t, trap), 1.0);
     }
+	//COLOR = vec4(float(count) / float(MAX_ITERS), 0.0, 0.0, 1.0);
 }
