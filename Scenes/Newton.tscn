@@ -13,6 +13,7 @@ shader_parameter/roots = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 shader_parameter/idClose = -1
 shader_parameter/rootCount = 0
 shader_parameter/color = 0
+shader_parameter/max_iters = 600
 
 [node name="ComplexRenderer" type="Node2D"]
 
