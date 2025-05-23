@@ -36,7 +36,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_use_anchors_ = true
 
-[node name="LineEdit" type="LineEdit" parent="CanvasLayer/Control" node_paths=PackedStringArray("sprite", "pauseMenu", "mandlebrotRenderer", "plotter")]
+[node name="LineEdit" type="LineEdit" parent="CanvasLayer/Control" node_paths=PackedStringArray("sprite", "pauseMenu")]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -50,9 +50,7 @@ sprite = NodePath("../../../Sprite2D")
 shader = SubResource("ShaderMaterial_pbp4u")
 useC = true
 pauseMenu = NodePath("../../../Pause")
-mandlebrotRenderer = NodePath("../../../Sprite2D")
 starterFunctions = PackedStringArray("z^2+c", "bar(z)^2+c", "abs(z)^2+c", "i^z + c", "z^5+c", "abs(real(z^2))+i*imag(z^2)+c", "abs(real(z^2))+i*abs(imag(z^2))+c", "z^(z+c)")
-plotter = NodePath("../../../Plotter")
 metadata/_edit_use_anchors_ = true
 
 [node name="Pause" parent="." node_paths=PackedStringArray("textEdit") instance=ExtResource("3_lo45j")]
@@ -60,11 +58,13 @@ layer = 96
 visible = false
 textEdit = NodePath("../CanvasLayer/Control/LineEdit")
 
-[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("TextEdit", "pauseMenu")]
+[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("TextEdit", "plotter", "compiler", "pauseMenu")]
 texture_filter = 1
 material = SubResource("ShaderMaterial_8cjuv")
 script = ExtResource("4_pbp4u")
 TextEdit = NodePath("../CanvasLayer/Control/LineEdit")
+plotter = NodePath("../Plotter")
+compiler = NodePath("../CanvasLayer/Control/LineEdit")
 pauseMenu = NodePath("../Pause")
 
 [node name="Camera2D" type="Camera2D" parent="."]

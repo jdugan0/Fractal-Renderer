@@ -13,15 +13,10 @@ public partial class RecompileComplexRenderer : LineEdit
     [Export] PauseMenu pauseMenu;
     String oldCode;
     bool outside = true;
-    [Export] public MandlebrotRenderer mandlebrotRenderer;
 
     [Export] public string[] starterFunctions;
 
-    Func<Complex, Complex, Complex> function;
-
-    [Export] Plotter plotter;
-
-    [Export] int plotterIterations = 50;
+    public Func<Complex, Complex, Complex> function;
     public override void _Ready()
     {
         oldCode = shader.Shader.Code;
@@ -43,36 +38,6 @@ public partial class RecompileComplexRenderer : LineEdit
             string func = starterFunctions[GD.Randi() % starterFunctions.Length];
             Text = func;
             recompile();
-        }
-        if (mandlebrotRenderer == null || plotter == null)
-        {
-            return;
-        }
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-mandlebrotRenderer._w / 2, -mandlebrotRenderer._h / 2);
-        Vector2 scale = (mouse / mandlebrotRenderer._w / mandlebrotRenderer.zoom) + mandlebrotRenderer.offset;
-        if (Input.IsActionPressed("Click") && useC && !HasFocus())
-        {
-            List<Vector2> points = new List<Vector2>();
-            Complex start = new Complex();
-            Complex c = new Complex(scale.X, scale.Y);
-            if (mandlebrotRenderer.julia){
-                start = new Complex(scale.X, scale.Y);
-                c = new Complex(mandlebrotRenderer.juliaPoint.X, mandlebrotRenderer.juliaPoint.Y);
-            }
-            Complex previous = function(start, c);
-            for (int i = 0; i < plotterIterations; i++)
-            {
-                Complex pointPixel = ((previous - new Complex(mandlebrotRenderer.offset.X, mandlebrotRenderer.offset.Y))
-                * mandlebrotRenderer.zoom * mandlebrotRenderer._w);
-                Vector2 point = new Vector2((float)pointPixel.Real, (float)pointPixel.Imaginary);
-                points.Add(point);
-                previous = function(previous, new Complex(scale.X, scale.Y));
-            }
-            plotter.SetPoints(points);
-        }
-        else
-        {
-            plotter.SetPoints(new List<Vector2>());
         }
     }
 

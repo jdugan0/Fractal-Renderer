@@ -34,7 +34,7 @@ void fragment() {
     vec2 c   = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
                               UV.y/SCREEN_PIXEL_SIZE.y),
                          res, zoomFactor, offset);
-	vec2 start = vec2(0.0, 0.0);			
+	vec2 start = vec2(0.0, 0.0);
 	if (julia) {
 		start = c;
 		c = juliaPoint;
