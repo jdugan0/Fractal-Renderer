@@ -53,7 +53,13 @@ public partial class RecompileComplexRenderer : LineEdit
         if (Input.IsActionPressed("Click") && useC && !HasFocus())
         {
             List<Vector2> points = new List<Vector2>();
-            Complex previous = function(new Complex(), new Complex(scale.X, scale.Y));
+            Complex start = new Complex();
+            Complex c = new Complex(scale.X, scale.Y);
+            if (mandlebrotRenderer.julia){
+                start = new Complex(scale.X, scale.Y);
+                c = new Complex(mandlebrotRenderer.juliaPoint.X, mandlebrotRenderer.juliaPoint.Y);
+            }
+            Complex previous = function(start, c);
             for (int i = 0; i < plotterIterations; i++)
             {
                 Complex pointPixel = ((previous - new Complex(mandlebrotRenderer.offset.X, mandlebrotRenderer.offset.Y))

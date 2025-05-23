@@ -5,9 +5,9 @@ public partial class MandlebrotRenderer : ViewBase
 {
     [Export] public LineEdit TextEdit;
 
-    Vector2 juliaPoint;
+    public Vector2 juliaPoint;
 
-    bool julia = false;
+    public bool julia = false;
 
     public override void HandleInput(double delta)
     {
