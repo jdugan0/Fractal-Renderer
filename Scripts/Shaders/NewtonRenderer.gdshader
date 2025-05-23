@@ -6,12 +6,12 @@ uniform vec2[100] roots;
 uniform int idClose = -1;
 uniform int rootCount = 0;
 uniform int color = 0;
-
+uniform int max_iters = 600;
 void fragment(){
     vec2 res = vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y);
     vec2 c = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x, UV.y/SCREEN_PIXEL_SIZE.y), res, zoomFactor, offset);
 	vec2 newC = c;
-	for (int j = 0; j < 600; j++){
+	for (int j = 0; j < max_iters; j++){
 		vec2 result = vec2(1,0);
 
 		vec2 prime = vec2(0);
@@ -23,7 +23,7 @@ void fragment(){
 		}
 		prime = complexMult(result,prime);
 		newC = newC - complexDivide(result, prime);
-		if (length(result) < 1e-4){
+		if (length(result) < 1e-3){
 			break;
 		}
 		 // using analytical derivative NOT numerical
