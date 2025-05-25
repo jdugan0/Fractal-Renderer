@@ -1,12 +1,16 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
+using Vector2 = Godot.Vector2;
 
 public partial class NewtonRenderer : ViewBase
 {
     List<Vector2> roots = new List<Vector2>();
     int color = 0;
     bool hover = false;
+    [Export] public int plotterIterations = 250;
+    [Export] public Plotter plotter;
     public override void _Ready()
     {
         base._Ready();
@@ -57,6 +61,41 @@ public partial class NewtonRenderer : ViewBase
             }
 
         }
+        if (Input.IsActionPressed("X") && !hover)
+        {
+            List<Vector2> points = new List<Vector2>();
+
+            Complex z = new Complex(scale.X, scale.Y);
+            for (int i = 0; i < plotterIterations; i++)
+            {
+                points.Add(ComplexToScreen(z));
+                Complex f = Complex.One;
+                Complex sum = Complex.Zero;
+                foreach (Vector2 r in roots)
+                {
+                    Complex diff = z - new Complex(r.X, r.Y);
+                    f *= diff;
+                    sum += Complex.One / diff;
+                }
+                Complex fp = f * sum;
+
+                if (f.Magnitude < 1e-3 || fp == Complex.Zero)
+                    break;
+
+                z -= f / fp;
+            }
+            plotter.SetPoints(points);
+        }
+        else
+        {
+            plotter.SetPoints(new List<Vector2>());
+        }
+    }
+
+    private Vector2 ComplexToScreen(Complex z)
+    {
+        Complex zp = (z - new Complex(offset.X, offset.Y)) * zoom * _w;
+        return new Vector2((float)zp.Real, (float)zp.Imaginary);
     }
 
     public void setHover(bool hover)

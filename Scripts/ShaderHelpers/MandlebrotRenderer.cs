@@ -55,7 +55,7 @@ public partial class MandlebrotRenderer : ViewBase
                 * zoom * _w);
                 Vector2 point = new Vector2((float)pointPixel.Real, (float)pointPixel.Imaginary);
                 points.Add(point);
-                previous = compiler.function(previous, new Complex(scale.X, scale.Y));
+                previous = compiler.function(previous, c);
             }
             plotter.SetPoints(points);
         }

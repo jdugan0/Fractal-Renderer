@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://4ps2lq1e6o73"]
+[gd_scene load_steps=7 format=3 uid="uid://4ps2lq1e6o73"]
 
 [ext_resource type="Shader" uid="uid://dl7afeptw68kh" path="res://Scripts/Shaders/NewtonRenderer.gdshader" id="2_xetub"]
 [ext_resource type="PackedScene" uid="uid://nd83sbyol6gj" path="res://Scenes/pause.tscn" id="3_br55d"]
 [ext_resource type="Script" uid="uid://duel8ovby28tx" path="res://Scripts/ShaderHelpers/NewtonRenderer.cs" id="3_xetub"]
 [ext_resource type="Script" uid="uid://bwsm752h8ax3e" path="res://Scripts/UIManager.cs" id="4_vyh1m"]
+[ext_resource type="Script" uid="uid://rv1fvuwi3gr7" path="res://Scripts/ShaderHelpers/Plotter.cs" id="5_d33t1"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8cjuv"]
 shader = ExtResource("2_xetub")
@@ -21,10 +22,11 @@ shader_parameter/max_iters = 600
 layer = 96
 visible = false
 
-[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("pauseMenu")]
+[node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("plotter", "pauseMenu")]
 texture_filter = 1
 material = SubResource("ShaderMaterial_8cjuv")
 script = ExtResource("3_xetub")
+plotter = NodePath("../Node2D")
 pauseMenu = NodePath("../Pause")
 
 [node name="Camera2D" type="Camera2D" parent="."]
@@ -65,5 +67,8 @@ popup/item_2/text = "Purple"
 popup/item_2/id = 2
 popup/item_3/text = "HSV"
 popup/item_3/id = 3
+
+[node name="Node2D" type="Node2D" parent="."]
+script = ExtResource("5_d33t1")
 
 [connection signal="item_selected" from="CanvasLayer/Control/OptionButton" to="Sprite2D" method="setColor"]
