@@ -11,6 +11,7 @@ public partial class NewtonRenderer : ViewBase
     bool hover = false;
     [Export] public int plotterIterations = 250;
     [Export] public Plotter plotter;
+    bool fancy = true;
     public override void _Ready()
     {
         base._Ready();
@@ -40,6 +41,10 @@ public partial class NewtonRenderer : ViewBase
             }
         }
 
+    }
+
+    public void ToggleFancy(bool toggle) {
+        fancy = toggle;
     }
 
     public override void HandleInput(double delta)
@@ -121,6 +126,7 @@ public partial class NewtonRenderer : ViewBase
         _mat.SetShaderParameter("idClose", id);
         _mat.SetShaderParameter("rootCount", Math.Min(roots.Count, 100));
         _mat.SetShaderParameter("color", color);
+        _mat.SetShaderParameter("fancy_shading", fancy);
     }
     public int findClosest()
     {

@@ -13,6 +13,7 @@ public partial class ViewBase : Sprite2D
     public int _w, _h;
     ImageTexture _tex = new ImageTexture();
     public ShaderMaterial _mat;
+    [Export] Label coordLabel;
 
     public override void _Ready()
     {
@@ -33,6 +34,12 @@ public partial class ViewBase : Sprite2D
         _mat = (ShaderMaterial)Material;
         HandleInput(delta);
         PushUniforms();
+        // Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
+        // Vector2 scale = (mouse / _w / zoom) + offset;
+        // coordLabel.Position = mouse;
+        // double xPos = Math.Round(scale.X * Math.Clamp(zoom, 1, 1e99)) / Math.Clamp(zoom, 1, 1e99);
+        // double yPos = Math.Round(scale.Y * Math.Clamp(zoom, 1, 1e99)) / Math.Clamp(zoom, 1, 1e99);
+        // coordLabel.Text = String.Format("{0}, {1}i", xPos, yPos);
     }
     public virtual void HandleInput(double delta)
     {

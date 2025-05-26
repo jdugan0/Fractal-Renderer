@@ -6,6 +6,8 @@ uniform float zoomFactor = 0.1;
 uniform vec2 juliaPoint = vec2(0.0, 0.0);
 uniform bool julia = false;
 
+uniform bool intColoring = false;
+
 
 vec2 func(vec2 z, vec2 c) {
 	vec2 result = vec2(0.00);
@@ -115,7 +117,7 @@ void fragment() {
     }
 
     if (!esc) {
-        COLOR = vec4(0.0, 0.0, 0.0, 1.0);
+        COLOR = vec4(!intColoring ? 0.0 : float(count)/float(MAX_ITERS), 0.0, 0.0, 1.0);
 		//if (cycle){
 			//COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 		//}

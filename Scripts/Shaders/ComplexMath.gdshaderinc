@@ -20,6 +20,22 @@ vec2 imag(vec2 a) {
 	return vec2(a.y,0.0);
 }
 
+vec3 rgb_to_hsv(vec3 c){
+    float Cmax = max(max(c.r, c.g), c.b);
+    float Cmin = min(min(c.r, c.g), c.b);
+    float delta = Cmax - Cmin;
+
+    float h = 0.0;
+    if (delta > 0.0){
+        if (Cmax == c.r)      h = 60.0 * mod(((c.g - c.b) / delta), 6.0);
+        else if (Cmax == c.g) h = 60.0 * (((c.b - c.r) / delta) + 2.0);
+        else                  h = 60.0 * (((c.r - c.g) / delta) + 4.0);
+    }
+    float s = (Cmax == 0.0) ? 0.0 : delta / Cmax;
+    float v = Cmax;
+    return vec3(h, s, v);
+}
+
 // z  => (x, y)
 // w  => (a, b)
 vec2 complex_pow_complex(vec2 z, vec2 w) {
