@@ -74,6 +74,24 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_lo45j")
 toggle_mode = true
 text = "JULIA SETS "
 
+[node name="Button2" type="Button" parent="CanvasLayer/Control"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -296.0
+offset_top = -105.0
+offset_bottom = -53.0
+grow_horizontal = 0
+grow_vertical = 0
+focus_mode = 0
+theme_override_font_sizes/font_size = 26
+theme_override_styles/pressed = SubResource("StyleBoxFlat_lo45j")
+toggle_mode = true
+text = "INT COLORING"
+
 [node name="Pause" parent="." node_paths=PackedStringArray("textEdit") instance=ExtResource("3_lo45j")]
 layer = 96
 visible = false
@@ -96,3 +114,4 @@ script = ExtResource("4_lo45j")
 
 [connection signal="text_changed" from="CanvasLayer/Control/LineEdit" to="CanvasLayer/Control/LineEdit" method="recompile"]
 [connection signal="toggled" from="CanvasLayer/Control/Button" to="Sprite2D" method="ToggleJulia"]
+[connection signal="toggled" from="CanvasLayer/Control/Button2" to="Sprite2D" method="ToggleIntColor"]

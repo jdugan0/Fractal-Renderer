@@ -117,7 +117,13 @@ void fragment() {
     }
 
     if (!esc) {
-        COLOR = vec4(!intColoring ? 0.0 : float(count)/float(MAX_ITERS), 0.0, 0.0, 1.0);
+		float logR_prev = log(length(z_prev));
+		float logR_curr = log(length(z));
+		float slope = logR_curr - logR_prev;
+		slope = max(slope, 1e-7);
+		float frac = (log(bailout) - logR_prev) / slope;
+		float mu1 = float(count - 1) + clamp(frac, 0.0, 1.0);
+        COLOR = vec4(!intColoring ? 0.0 : mu1/float(MAX_ITERS), 0.0, 0.0, 1.0);
 		//if (cycle){
 			//COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 		//}

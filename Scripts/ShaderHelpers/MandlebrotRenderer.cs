@@ -15,6 +15,8 @@ public partial class MandlebrotRenderer : ViewBase
     [Export] public Plotter plotter;
     [Export] public RecompileComplexRenderer compiler;
     [Export] public Button juliaBox;
+    [Export] public Button intColorBox;
+    bool intColor = false;
     bool juliaFromBox;
 
     public override void HandleInput(double delta)
@@ -71,10 +73,14 @@ public partial class MandlebrotRenderer : ViewBase
         julia = toggle;
         juliaFromBox = true;
     }
+    public void ToggleIntColor(bool toggle){
+        intColor = toggle;
+    }
     public override void PushUniforms()
     {
         base.PushUniforms();
         _mat.SetShaderParameter("julia", julia);
         _mat.SetShaderParameter("juliaPoint", juliaPoint);
+        _mat.SetShaderParameter("intColoring", intColor);
     }
 }
