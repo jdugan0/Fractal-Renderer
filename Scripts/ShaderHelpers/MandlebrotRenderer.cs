@@ -19,13 +19,78 @@ public partial class MandlebrotRenderer : ViewBase
     bool intColor = false;
     bool juliaFromBox;
 
+    [Export] public int maxIters = 500;
+    [Export] public double diffStep = 1e-8;
+    private Vector2[] _orbitCPU;
+    private Vector2[] _dzdC_CPU;
+    private Func<Complex, Complex, Complex> _f;
+    Complex c_ref = new Complex();
+    private Func<Complex, Complex, double, Complex> _partialZ;
+    private Func<Complex, Complex, double, Complex> _partialC;
+
+    private void InitNumerics()
+    {
+        _f = compiler.function;
+        _partialZ = (z, c, h) => ExpressionToGLSL.ComplexDiff.DfDz(_f, z, c, h);
+        _partialC = (z, c, h) => ExpressionToGLSL.ComplexDiff.DfDc(_f, z, c, h);
+        _orbitCPU = new Vector2[maxIters + 1];
+        _dzdC_CPU = new Vector2[maxIters + 1];
+    }
+
+
+
+    public void ComputeOrbital()
+    {
+        InitNumerics();
+        Complex z = Complex.Zero;
+        Complex dzdc = Complex.Zero;
+        c_ref = new Complex(offset.X, offset.Y);
+        for (int i = 0; i <= maxIters; i++)
+        {
+            _orbitCPU[i] = new Vector2((float)z.Real, (float)z.Imaginary);
+            _dzdC_CPU[i] = new Vector2((float)dzdc.Real, (float)dzdc.Imaginary);
+
+            // forward 1 step
+            var fz = _f(z, c_ref);
+            var fz_z = _partialZ(z, c_ref, diffStep);
+            var fz_c = _partialC(z, c_ref, diffStep);
+            dzdc = fz_z * dzdc + fz_c;
+            z = fz;
+        }
+        PackOrbit();
+    }
+
+    public void PackOrbit()
+    {
+        int n = maxIters + 1;
+
+        Image imgOrbit = Image.CreateEmpty(n, 1, false, Image.Format.Rgf);
+        Image imgDzdc = Image.CreateEmpty(n, 1, false, Image.Format.Rgf);
+
+        for (int i = 0; i < n; i++)
+        {
+            var o = _orbitCPU[i];
+            var d = _dzdC_CPU[i];
+            imgOrbit.SetPixelv(new Vector2I(i, 0), new Color(o.X, o.Y, 0, 0));
+            imgDzdc.SetPixelv(new Vector2I(i, 0), new Color(d.X, d.Y, 0, 0));
+        }
+
+        ImageTexture orbitTex = ImageTexture.CreateFromImage(imgOrbit);
+        ImageTexture dzdcTex = ImageTexture.CreateFromImage(imgDzdc);
+
+        _mat.SetShaderParameter("orbitTex", orbitTex);
+        _mat.SetShaderParameter("dzdCTex", dzdcTex);
+        _mat.SetShaderParameter("c_ref", new Vector2((float)c_ref.Real, (float)c_ref.Imaginary));
+    }
+
     public override void HandleInput(double delta)
     {
         if (TextEdit.HasFocus())
         {
             return;
         }
-        if (!julia){
+        if (!julia)
+        {
             juliaFromBox = false;
         }
         if (Input.IsActionJustPressed("RightClick"))
@@ -68,19 +133,23 @@ public partial class MandlebrotRenderer : ViewBase
         base.HandleInput(delta);
     }
 
-    public void ToggleJulia(bool toggle){
+    public void ToggleJulia(bool toggle)
+    {
 
         julia = toggle;
         juliaFromBox = true;
     }
-    public void ToggleIntColor(bool toggle){
+    public void ToggleIntColor(bool toggle)
+    {
         intColor = toggle;
     }
     public override void PushUniforms()
     {
+        ComputeOrbital();
         base.PushUniforms();
         _mat.SetShaderParameter("julia", julia);
         _mat.SetShaderParameter("juliaPoint", juliaPoint);
         _mat.SetShaderParameter("intColoring", intColor);
+        _mat.SetShaderParameter("MAX_ITERS", maxIters);
     }
 }

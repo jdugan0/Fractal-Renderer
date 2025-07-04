@@ -8,6 +8,14 @@ uniform bool julia = false;
 
 uniform bool intColoring = false;
 
+uniform sampler2D orbitTex;
+uniform sampler2D dzdCTex;
+uniform vec2 c_ref;
+const int MAX_ITERS = 500;
+
+vec2 get_orbit(int i){ return texelFetch(orbitTex,  ivec2(i,0), 0).rg; }
+vec2 get_dzdc (int i){ return texelFetch(dzdCTex, ivec2(i,0), 0).rg; }
+
 
 vec2 func(vec2 z, vec2 c) {
 	vec2 result = vec2(0.00);
@@ -36,19 +44,18 @@ void fragment() {
     vec2 c   = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
                               UV.y/SCREEN_PIXEL_SIZE.y),
                          res, zoomFactor, offset);
+	vec2 deltaC = c - c_ref;
 	vec2 start = vec2(0.0, 0.0);
 	if (julia) {
 		start = c;
 		c = juliaPoint;
 	}
-    vec2 z = func(start, c);
+	vec2 z = get_orbit(0) + get_dzdc(0) * deltaC;
 
     float trap     = 1e20;
     float mu       = 0.0;
     bool  esc      = false;
     bool  cycle    = false;
-
-    const int MAX_ITERS = 250;
     const int MIN_ITERS = 20;
 	bool mu_lock = false;
 
@@ -63,11 +70,12 @@ void fragment() {
 	vec2 z_prev = z;
 	int pcount = 0;
 
-    for (int i = 0; i < MAX_ITERS; ++i) {
+    for (int i = 1; i < MAX_ITERS; ++i) {
 		count = i;
-        /* normal fractal iteration */
-        z = func(z, c);
-
+        vec2 z_ref  = get_orbit(i);
+		vec2 dzdc   = get_dzdc(i);
+		z = z_ref + dzdc * deltaC;
+		//COLOR = vec4(0.0,0.0,1.0,1.0);
 		if (length(z - z_prev) < eps) {
             cycle = true;
             break;
@@ -75,7 +83,7 @@ void fragment() {
         vec2 delta = z - c;
         float r2   = dot(delta, delta);
         trap       = min(trap, r2);
-
+		//COLOR = vec4(1.0,0.0,0.0,1.0);
 		if (non_finite(z)) {
 	        esc = true;
 	        if (!mu_lock){
@@ -83,6 +91,8 @@ void fragment() {
 			}
 	        break;
     	}
+		
+		//COLOR = vec4(0.0,1.0,0.0,1.0);
 
 
         if (r2 > bailout) {
@@ -124,6 +134,8 @@ void fragment() {
 		float frac = (log(bailout) - logR_prev) / slope;
 		float mu1 = float(count - 1) + clamp(frac, 0.0, 1.0);
         COLOR = vec4(!intColoring ? 0.0 : mu1/float(MAX_ITERS), 0.0, 0.0, 1.0);
+		
+		
 		//if (cycle){
 			//COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 		//}
