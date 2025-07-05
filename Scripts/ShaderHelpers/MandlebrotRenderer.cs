@@ -1,4 +1,6 @@
+using ExpressionToGLSL;
 using Godot;
+using Meta.Numerics.Analysis;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -19,13 +21,50 @@ public partial class MandlebrotRenderer : ViewBase
     bool intColor = false;
     bool juliaFromBox;
 
+    int maxIters = 500;
+    public void ComputeOrbit()
+    {
+
+        Complex c_ref = new Complex(offset.X, offset.Y);
+        Complex z = compiler.function.Invoke(Complex.Zero, c_ref);
+        GD.Print(zoom);
+        Func<Complex, Complex, Complex> dfdc = (z, c) => ComplexDiff.DfDc(compiler.function, z, c);
+        Func<Complex, Complex, Complex> dfdz = (z, c) => ComplexDiff.DfDz(compiler.function, z, c);
+        Complex[] J = new Complex[maxIters];   // partial z
+        Complex[] K = new Complex[maxIters];   // partial c
+        Complex[] F = new Complex[maxIters];
+        for (int i = 0; i < maxIters; i++)
+        {
+            J[i] = dfdz(z, c_ref);
+            K[i] = dfdc(z, c_ref);
+            F[i] = z;
+
+            z = compiler.function(z, c_ref);
+
+        }
+
+        Vector2[] Jvec = new Vector2[maxIters];
+        Vector2[] Kvec = new Vector2[maxIters];
+        Vector2[] Fvec = new Vector2[maxIters];
+        for (int i = 0; i < maxIters; i++)
+        {
+            Jvec[i] = new Vector2((float)J[i].Real, (float)J[i].Imaginary);
+            Kvec[i] = new Vector2((float)K[i].Real, (float)K[i].Imaginary);
+            Fvec[i] = new Vector2((float)F[i].Real, (float)F[i].Imaginary);
+        }
+        _mat.SetShaderParameter("ref_J", Jvec);
+        _mat.SetShaderParameter("ref_K", Kvec);
+        _mat.SetShaderParameter("ref_F", Fvec);
+    }
+
     public override void HandleInput(double delta)
     {
         if (TextEdit.HasFocus())
         {
             return;
         }
-        if (!julia){
+        if (!julia)
+        {
             juliaFromBox = false;
         }
         if (Input.IsActionJustPressed("RightClick"))
@@ -68,12 +107,14 @@ public partial class MandlebrotRenderer : ViewBase
         base.HandleInput(delta);
     }
 
-    public void ToggleJulia(bool toggle){
+    public void ToggleJulia(bool toggle)
+    {
 
         julia = toggle;
         juliaFromBox = true;
     }
-    public void ToggleIntColor(bool toggle){
+    public void ToggleIntColor(bool toggle)
+    {
         intColor = toggle;
     }
     public override void PushUniforms()
@@ -82,5 +123,6 @@ public partial class MandlebrotRenderer : ViewBase
         _mat.SetShaderParameter("julia", julia);
         _mat.SetShaderParameter("juliaPoint", juliaPoint);
         _mat.SetShaderParameter("intColoring", intColor);
+        ComputeOrbit();
     }
 }

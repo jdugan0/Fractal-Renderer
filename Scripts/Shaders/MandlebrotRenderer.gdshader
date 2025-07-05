@@ -8,6 +8,12 @@ uniform bool julia = false;
 
 uniform bool intColoring = false;
 
+const int MAX_ITERS = 500;
+uniform vec2[MAX_ITERS] ref_J;
+uniform vec2[MAX_ITERS] ref_K;
+uniform vec2[MAX_ITERS] ref_F;
+
+
 
 vec2 func(vec2 z, vec2 c) {
 	vec2 result = vec2(0.00);
@@ -41,14 +47,15 @@ void fragment() {
 		start = c;
 		c = juliaPoint;
 	}
-    vec2 z = func(start, c);
-
+	vec2 c_ref = offset;
+    vec2 delta_c = c - c_ref;
+	
+	vec2 z = func(vec2(0.0),c);
+	vec2 delta = z-ref_F[0];
     float trap     = 1e20;
     float mu       = 0.0;
     bool  esc      = false;
     bool  cycle    = false;
-
-    const int MAX_ITERS = 250;
     const int MIN_ITERS = 20;
 	bool mu_lock = false;
 
@@ -62,18 +69,32 @@ void fragment() {
 	const int PERIOD = 20;
 	vec2 z_prev = z;
 	int pcount = 0;
-
-    for (int i = 0; i < MAX_ITERS; ++i) {
+	z = ref_F[0] + delta;
+    for (int i = 1; i < MAX_ITERS; ++i) {
 		count = i;
-        /* normal fractal iteration */
-        z = func(z, c);
-
+        if (length(delta_c) <= 0.001){
+			vec2 J = ref_J[i];
+			vec2 K = ref_K[i];
+			vec2 F = ref_F[i]; 
+			
+			delta = complexMult(J, delta) + complexMult(K, delta_c);
+			z = F + delta;
+		}
+		else{
+			z = func(z, c);
+		}
+		//float REBASE_R = 1e-3; 
+		//if (length(delta) > REBASE_R) {
+		    //COLOR = vec4(1.0, 0.0, 0.0, 1.0);
+		//}
+		
 		if (length(z - z_prev) < eps) {
             cycle = true;
             break;
         }
-        vec2 delta = z - c;
-        float r2   = dot(delta, delta);
+		
+        vec2 dzc = z - c;
+        float r2   = dot(dzc, dzc);
         trap       = min(trap, r2);
 
 		if (non_finite(z)) {
