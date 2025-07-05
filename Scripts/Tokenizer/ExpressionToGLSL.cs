@@ -752,4 +752,28 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
 
         #endregion
     }
+    public static class ComplexDiff
+    {
+        private const double DoubleEps = 2.220446049250313e-16; // 2^-52
+
+        private static double Step(double mag) =>
+            Math.Sqrt(DoubleEps) * Math.Max(1.0, mag);          // ≈1.5e-8·scale
+
+        public static Complex DfDz(Func<Complex, Complex, Complex> f,
+                                   Complex z, Complex c)
+        {
+            double h = Step(Complex.Abs(z));
+            Complex dz = new Complex(h, 0);
+            return (f(z + dz, c) - f(z - dz, c)) / (2.0 * h);
+        }
+
+        public static Complex DfDc(Func<Complex, Complex, Complex> f,
+                                   Complex z, Complex c)
+        {
+            double h = Step(Complex.Abs(c));
+            Complex dc = new Complex(h, 0);
+            return (f(z, c + dc) - f(z, c - dc)) / (2.0 * h);
+        }
+    }
+
 }
