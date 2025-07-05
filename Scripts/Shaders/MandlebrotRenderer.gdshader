@@ -5,6 +5,7 @@ uniform float zoomFactor = 0.1;
 
 uniform vec2 juliaPoint = vec2(0.0, 0.0);
 uniform bool julia = false;
+uniform float radius;
 
 uniform bool intColoring = false;
 
@@ -49,9 +50,19 @@ void fragment() {
 	}
 	vec2 c_ref = offset;
     vec2 delta_c = c - c_ref;
-	
-	vec2 z = func(vec2(0.0),c);
-	vec2 delta = z-ref_F[0];
+	float RADIUS = 0.001;
+	vec2 delta = vec2(0.0);
+	vec2 z;
+	if (length(delta_c) <= RADIUS) {
+	    // --- pure perturbation path ---------------------------------
+	    // first-order estimate of pixel’s Z1
+	    delta = complexMult(ref_K[0], delta_c);   // K0 · δc
+	    z = ref_F[1] + delta;                 // Z1_ref + δz1
+	} else {
+	    // --- ordinary path ------------------------------------------
+	    z = func(vec2(0.0), c);                   // Z1 by brute force
+	}
+
     float trap     = 1e20;
     float mu       = 0.0;
     bool  esc      = false;
@@ -67,18 +78,17 @@ void fragment() {
     int  lam       = 0;  // distance travelled since last reset
 	int count;
 	const int PERIOD = 20;
-	vec2 z_prev = z;
 	int pcount = 0;
-	z = ref_F[0] + delta;
-    for (int i = 1; i < MAX_ITERS; ++i) {
+	vec2 z_prev = z;
+    for (int i = 1; i < MAX_ITERS - 1; ++i) {
 		count = i;
-        if (length(delta_c) <= 0.001){
-			vec2 J = ref_J[i];
-			vec2 K = ref_K[i];
-			vec2 F = ref_F[i]; 
-			
-			delta = complexMult(J, delta) + complexMult(K, delta_c);
-			z = F + delta;
+        if (length(delta_c) <= RADIUS){
+	        vec2 J = ref_J[i];        // derivatives at Z_i
+	        vec2 K = ref_K[i];
+	        vec2 F = ref_F[i + 1];    // Z_{i+1}
+	        delta = complexMult(J, delta) + complexMult(K, delta_c);
+			//COLOR = vec4(length(delta) * 100.0, 0.0, 0.0, 1.0);
+	        z = F + delta;
 		}
 		else{
 			z = func(z, c);

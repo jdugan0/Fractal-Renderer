@@ -26,8 +26,8 @@ public partial class MandlebrotRenderer : ViewBase
     {
 
         Complex c_ref = new Complex(offset.X, offset.Y);
-        Complex z = compiler.function.Invoke(Complex.Zero, c_ref);
-        GD.Print(zoom);
+        Complex z = Complex.Zero;
+
         Func<Complex, Complex, Complex> dfdc = (z, c) => ComplexDiff.DfDc(compiler.function, z, c);
         Func<Complex, Complex, Complex> dfdz = (z, c) => ComplexDiff.DfDz(compiler.function, z, c);
         Complex[] J = new Complex[maxIters];   // partial z
@@ -52,6 +52,7 @@ public partial class MandlebrotRenderer : ViewBase
             Kvec[i] = new Vector2((float)K[i].Real, (float)K[i].Imaginary);
             Fvec[i] = new Vector2((float)F[i].Real, (float)F[i].Imaginary);
         }
+        float pixel = 1.0f / (_w * zoom);
         _mat.SetShaderParameter("ref_J", Jvec);
         _mat.SetShaderParameter("ref_K", Kvec);
         _mat.SetShaderParameter("ref_F", Fvec);
