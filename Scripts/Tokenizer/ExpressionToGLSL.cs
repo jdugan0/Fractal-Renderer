@@ -761,7 +761,6 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
             return (f(z + hC, c) - f(z - hC, c)) / (2 * h);
         }
 
-        // central finite difference w.r.t. the *second* argument (c)
         public static Complex DfDc(Func<Complex, Complex, Complex> f,
                                    Complex z, Complex c, double h = 1e-8)
         {

@@ -150,6 +150,5 @@ public partial class MandlebrotRenderer : ViewBase
         _mat.SetShaderParameter("julia", julia);
         _mat.SetShaderParameter("juliaPoint", juliaPoint);
         _mat.SetShaderParameter("intColoring", intColor);
-        _mat.SetShaderParameter("MAX_ITERS", maxIters);
     }
 }
