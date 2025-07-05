@@ -8,6 +8,12 @@ uniform bool julia = false;
 
 uniform bool intColoring = false;
 
+uniform bool  usePerturb    = false;
+uniform vec2  c_ref;
+uniform int   maxIters;
+uniform vec2  ref_F[250];         // z_ref(i)
+uniform vec2  ref_J[250];         // ∂f/∂z  at reference
+uniform vec2  ref_K[250];         // ∂f/∂c  at reference
 
 vec2 func(vec2 z, vec2 c) {
 	vec2 result = vec2(0.00);
@@ -41,7 +47,7 @@ void fragment() {
 		start = c;
 		c = juliaPoint;
 	}
-    vec2 z = func(start, c);
+    vec2 z = start;
 
     float trap     = 1e20;
     float mu       = 0.0;
@@ -62,18 +68,32 @@ void fragment() {
 	const int PERIOD = 20;
 	vec2 z_prev = z;
 	int pcount = 0;
+	
+	
+	vec2 delta  = c - c_ref;
+	vec2 Delta  = vec2(0.0);
+	
 
     for (int i = 0; i < MAX_ITERS; ++i) {
 		count = i;
         /* normal fractal iteration */
-        z = func(z, c);
+        if (!usePerturb){
+			z = func(z, c);
+		}
+		else{
+			vec2 z_ref  = ref_F[i];
+			vec2 dfdz = ref_J[i];
+			vec2 dfdc = ref_K[i];
+			Delta = complexMult(dfdz, Delta) + complexMult(dfdc, delta);
+			z = z_ref + Delta;
+		}
 
-		if (length(z - z_prev) < eps) {
+		if (!usePerturb && length(z - z_prev) < eps) {
             cycle = true;
             break;
         }
-        vec2 delta = z - c;
-        float r2   = dot(delta, delta);
+        vec2 dzc  = z - c;
+        float r2   = dot(dzc , dzc );
         trap       = min(trap, r2);
 
 		if (non_finite(z)) {
@@ -103,7 +123,7 @@ void fragment() {
 
 
         ++lam;
-        if (dot(z - tortoise, z - tortoise) < eps*eps) {
+        if (!usePerturb && dot(z - tortoise, z - tortoise) < eps*eps) {
             cycle = true;
             break;              // found a repeat → interior / attractive cycle
         }

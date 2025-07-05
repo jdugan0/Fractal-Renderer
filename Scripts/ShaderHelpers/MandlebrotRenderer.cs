@@ -49,9 +49,14 @@ public partial class MandlebrotRenderer : ViewBase
             Kvec[i] = new Vector2((float)K[i].Real, (float)K[i].Imaginary);
             Fvec[i] = new Vector2((float)F[i].Real, (float)F[i].Imaginary);
         }
+        double pixelSize = 2.0 / (zoom * Math.Max(_w, _h));
+        bool usePerturb = pixelSize < 1e-6;
+        GD.Print(usePerturb);
+        _mat.SetShaderParameter("usePerturb", usePerturb);
         _mat.SetShaderParameter("ref_J", Jvec);
         _mat.SetShaderParameter("ref_K", Kvec);
         _mat.SetShaderParameter("ref_F", Fvec);
+        _mat.SetShaderParameter("c_ref", offset);
     }
 
     public override void HandleInput(double delta)
