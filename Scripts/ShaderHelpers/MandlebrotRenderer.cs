@@ -39,7 +39,7 @@ public partial class MandlebrotRenderer : ViewBase
 
             z = compiler.function(z, c_ref);
         }
-
+        
         Vector2[] Jvec = new Vector2[maxIters];
         Vector2[] Kvec = new Vector2[maxIters];
         Vector2[] Fvec = new Vector2[maxIters];
@@ -48,11 +48,13 @@ public partial class MandlebrotRenderer : ViewBase
             Jvec[i] = new Vector2((float)J[i].Real, (float)J[i].Imaginary);
             Kvec[i] = new Vector2((float)K[i].Real, (float)K[i].Imaginary);
             Fvec[i] = new Vector2((float)F[i].Real, (float)F[i].Imaginary);
+            // GD.Print(Fvec[i]);
         }
+        // GD.Print("F: " + F[10] + " F*: " + Fvec[10] + " Offset: " + offset);
         double pixelSize = 2.0 / (zoom * Math.Max(_w, _h));
         bool usePerturb = pixelSize < 1e-6;
-        GD.Print(usePerturb);
-        _mat.SetShaderParameter("usePerturb", usePerturb);
+        // GD.Print(usePerturb);
+        _mat.SetShaderParameter("usePerturb", true);
         _mat.SetShaderParameter("ref_J", Jvec);
         _mat.SetShaderParameter("ref_K", Kvec);
         _mat.SetShaderParameter("ref_F", Fvec);

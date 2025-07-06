@@ -10,7 +10,6 @@ uniform bool intColoring = false;
 
 uniform bool  usePerturb    = false;
 uniform vec2  c_ref;
-uniform int   maxIters;
 uniform vec2  ref_F[250];         // z_ref(i)
 uniform vec2  ref_J[250];         // ∂f/∂z  at reference
 uniform vec2  ref_K[250];         // ∂f/∂c  at reference
@@ -43,6 +42,7 @@ void fragment() {
                               UV.y/SCREEN_PIXEL_SIZE.y),
                          res, zoomFactor, offset);
 	vec2 start = vec2(0.0, 0.0);
+
 	if (julia) {
 		start = c;
 		c = juliaPoint;
@@ -68,11 +68,10 @@ void fragment() {
 	const int PERIOD = 20;
 	vec2 z_prev = z;
 	int pcount = 0;
-	
-	
-	vec2 delta  = c - c_ref;
+
+	vec2 delta = c - offset;
 	vec2 Delta  = vec2(0.0);
-	
+
 
     for (int i = 0; i < MAX_ITERS; ++i) {
 		count = i;
@@ -87,6 +86,10 @@ void fragment() {
 			Delta = complexMult(dfdz, Delta) + complexMult(dfdc, delta);
 			z = z_ref + Delta;
 		}
+		//if (i == 0 && usePerturb) {
+    		//COLOR = vec4(ref_F[2], 0.0, 1.0);
+    		//break;
+		//}
 
 		if (!usePerturb && length(z - z_prev) < eps) {
             cycle = true;
@@ -143,13 +146,13 @@ void fragment() {
 		slope = max(slope, 1e-7);
 		float frac = (log(bailout) - logR_prev) / slope;
 		float mu1 = float(count - 1) + clamp(frac, 0.0, 1.0);
-        COLOR = vec4(!intColoring ? 0.0 : mu1/float(MAX_ITERS), 0.0, 0.0, 1.0);
+        //COLOR = vec4(!intColoring ? 0.0 : mu1/float(MAX_ITERS), 0.0, 0.0, 1.0);
 		//if (cycle){
 			//COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 		//}
     } else {
         float t = mu / float(MAX_ITERS);
-        COLOR   = vec4(blend_pal(t, trap), 1.0);
+        //COLOR   = vec4(blend_pal(t, trap), 1.0);
     }
 	//COLOR = vec4(float(count) / float(MAX_ITERS), 0.0, 0.0, 1.0);
 }

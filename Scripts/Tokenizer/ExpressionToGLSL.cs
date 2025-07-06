@@ -757,7 +757,7 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
         private const double DoubleEps = 2.220446049250313e-16; // 2^-52
 
         private static double Step(double mag) =>
-            Math.Sqrt(DoubleEps) * Math.Max(1.0, mag);          // ≈1.5e-8·scale
+            Math.Cbrt(DoubleEps) * Math.Max(1.0, mag);
 
         public static Complex DfDz(Func<Complex, Complex, Complex> f,
                                    Complex z, Complex c)
