@@ -9,7 +9,7 @@ public partial class MandlebrotRenderer : ViewBase
 {
     [Export] public LineEdit TextEdit;
 
-    public Vector2 juliaPoint;
+    public Complex juliaPoint;
 
     public bool julia = false;
     [Export] public int plotterIterations = 250;
@@ -23,11 +23,11 @@ public partial class MandlebrotRenderer : ViewBase
 
     public void ComputeOrbital()
     {
-        Complex c_ref = new Complex(offset.X, offset.Y);
+        Complex c_ref = offset;
         Complex z = Complex.Zero;
 
-        Func<Complex, Complex, Complex> dfdc = (z, c) => ComplexDiff.DfDc(compiler.function, z, c);
-        Func<Complex, Complex, Complex> dfdz = (z, c) => ComplexDiff.DfDz(compiler.function, z, c);
+        Func<Complex, Complex, Complex> dfdc = (z, c) => ComplexMathHelp.DfDc(compiler.function, z, c);
+        Func<Complex, Complex, Complex> dfdz = (z, c) => ComplexMathHelp.DfDz(compiler.function, z, c);
         Complex[] J = new Complex[maxIters];   // partial z
         Complex[] K = new Complex[maxIters];   // partial c
         Complex[] F = new Complex[maxIters];
@@ -35,11 +35,11 @@ public partial class MandlebrotRenderer : ViewBase
         {
             J[i] = dfdz(z, c_ref);
             K[i] = dfdc(z, c_ref);
-            F[i] = z;
-
             z = compiler.function(z, c_ref);
+
+            F[i] = z;
         }
-        
+
         Vector2[] Jvec = new Vector2[maxIters];
         Vector2[] Kvec = new Vector2[maxIters];
         Vector2[] Fvec = new Vector2[maxIters];
@@ -54,11 +54,11 @@ public partial class MandlebrotRenderer : ViewBase
         double pixelSize = 2.0 / (zoom * Math.Max(_w, _h));
         bool usePerturb = pixelSize < 1e-6;
         // GD.Print(usePerturb);
-        _mat.SetShaderParameter("usePerturb", true);
+        _mat.SetShaderParameter("usePerturb", usePerturb);
         _mat.SetShaderParameter("ref_J", Jvec);
         _mat.SetShaderParameter("ref_K", Kvec);
         _mat.SetShaderParameter("ref_F", Fvec);
-        _mat.SetShaderParameter("c_ref", offset);
+        _mat.SetShaderParameter("c_ref", new Godot.Vector2((float)offset.Real, (float)offset.Imaginary));
     }
 
     public override void HandleInput(double delta)
@@ -76,8 +76,9 @@ public partial class MandlebrotRenderer : ViewBase
             julia = !julia;
             juliaBox.SetPressedNoSignal(julia);
         }
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
+        Vector2 mouseV = GetViewport().GetMousePosition();
+        Complex mouse = new Complex(mouseV.X, mouseV.Y) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
         if (Input.IsActionPressed("RightClick") || juliaFromBox)
         {
             juliaPoint = scale;
@@ -87,17 +88,16 @@ public partial class MandlebrotRenderer : ViewBase
         {
             List<Vector2> points = new List<Vector2>();
             Complex start = new Complex();
-            Complex c = new Complex(scale.X, scale.Y);
+            Complex c = scale;
             if (julia)
             {
-                start = new Complex(scale.X, scale.Y);
-                c = new Complex(juliaPoint.X, juliaPoint.Y);
+                start = scale;
+                c = juliaPoint;
             }
             Complex previous = compiler.function(start, c);
             for (int i = 0; i < plotterIterations; i++)
             {
-                Complex pointPixel = ((previous - new Complex(offset.X, offset.Y))
-                * zoom * _w);
+                Complex pointPixel = (previous - offset) * zoom * _w;
                 Vector2 point = new Vector2((float)pointPixel.Real, (float)pointPixel.Imaginary);
                 points.Add(point);
                 previous = compiler.function(previous, c);
@@ -126,7 +126,7 @@ public partial class MandlebrotRenderer : ViewBase
         ComputeOrbital();
         base.PushUniforms();
         _mat.SetShaderParameter("julia", julia);
-        _mat.SetShaderParameter("juliaPoint", juliaPoint);
+        _mat.SetShaderParameter("juliaPoint", new Godot.Vector2((float)juliaPoint.Real, (float)juliaPoint.Imaginary));
         _mat.SetShaderParameter("intColoring", intColor);
     }
 }

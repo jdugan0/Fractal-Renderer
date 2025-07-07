@@ -752,7 +752,7 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
 
         #endregion
     }
-    public static class ComplexDiff
+    public static class ComplexMathHelp
     {
         private const double DoubleEps = 2.220446049250313e-16; // 2^-52
 
@@ -774,6 +774,15 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
             Complex dc = new Complex(h, 0);
             return (f(z, c + dc) - f(z, c - dc)) / (2.0 * h);
         }
+        public static (float hi, float lo) SplitDouble(double d)
+        {
+            // Basic Dekker split: hi gets the upper 24 bits, lo carries the remainder.
+            float hi = (float)d;
+            float lo = (float)(d - (double)hi);
+            return (hi, lo);
+        }
     }
+
+
 
 }

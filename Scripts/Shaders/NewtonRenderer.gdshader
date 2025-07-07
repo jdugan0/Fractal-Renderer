@@ -21,7 +21,7 @@
 			vec2 result = vec2(1,0);
 
 			vec2 prime = vec2(0);
-			
+
 			for (int i = 0; i < rootCount; i++){
 				vec2 root = roots[i];
 				result = complexMult(result, (newC - root));
@@ -50,7 +50,7 @@
 		}
 		else{
 			vec3 base;
-			shade = pow(shade, 0.6); 
+			shade = pow(shade, 0.6);
 			float rshade = 1.0 + residual / 10.0;
 			float shade_new = 0.6 * shade + 0.4 * rshade;
 			switch (color){

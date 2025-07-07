@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Numerics;
 using Vector2 = Godot.Vector2;
 
@@ -25,11 +26,12 @@ public partial class NewtonRenderer : ViewBase
         {
             return;
         }
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
+        Vector2 mouseV = GetViewport().GetMousePosition();
+        Complex mouse = new Complex(mouseV.X, mouseV.Y) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
         if (@event.IsActionPressed("Click"))
         {
-            roots.Add(scale);
+            roots.Add(new Godot.Vector2((float)scale.Real, (float)scale.Imaginary));
         }
         if (@event.IsActionPressed("MMB"))
         {
@@ -49,8 +51,9 @@ public partial class NewtonRenderer : ViewBase
 
     public override void HandleInput(double delta)
     {
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
+        Vector2 mouseV = GetViewport().GetMousePosition();
+        Complex mouse = new Complex(mouseV.X, mouseV.Y) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
         base.HandleInput(delta);
         if (pauseMenu.paused)
         {
@@ -61,7 +64,7 @@ public partial class NewtonRenderer : ViewBase
             int id = findClosest();
             if (id != -1)
             {
-                roots[id] = scale;
+                roots[id] = new Godot.Vector2((float)scale.Real, (float)scale.Imaginary);
 
             }
 
@@ -70,7 +73,7 @@ public partial class NewtonRenderer : ViewBase
         {
             List<Vector2> points = new List<Vector2>();
 
-            Complex z = new Complex(scale.X, scale.Y);
+            Complex z = scale;
             for (int i = 0; i < plotterIterations; i++)
             {
                 points.Add(ComplexToScreen(z));
@@ -99,7 +102,7 @@ public partial class NewtonRenderer : ViewBase
 
     private Vector2 ComplexToScreen(Complex z)
     {
-        Complex zp = (z - new Complex(offset.X, offset.Y)) * zoom * _w;
+        Complex zp = (z - offset) * zoom * _w;
         return new Vector2((float)zp.Real, (float)zp.Imaginary);
     }
 
@@ -130,15 +133,16 @@ public partial class NewtonRenderer : ViewBase
     }
     public int findClosest()
     {
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
+        Vector2 mouseV = GetViewport().GetMousePosition();
+        Complex mouse = new Complex(mouseV.X, mouseV.Y) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
         float best = float.MaxValue;
         int id = -1;
         for (int i = 0; i < roots.Count; i++)
         {
-            if (roots[i].DistanceTo(scale) < best)
+            if (roots[i].DistanceTo(new Godot.Vector2((float)scale.Real, (float)scale.Imaginary)) < best)
             {
-                best = roots[i].DistanceTo(scale);
+                best = roots[i].DistanceTo(new Godot.Vector2((float)scale.Real, (float)scale.Imaginary));
                 id = i;
             }
         }

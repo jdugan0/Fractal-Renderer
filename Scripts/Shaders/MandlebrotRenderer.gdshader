@@ -69,7 +69,9 @@ void fragment() {
 	vec2 z_prev = z;
 	int pcount = 0;
 
-	vec2 delta = c - offset;
+	vec2 delta = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
+                              UV.y/SCREEN_PIXEL_SIZE.y),
+                         res, zoomFactor, vec2(0.0));
 	vec2 Delta  = vec2(0.0);
 
 
@@ -146,13 +148,13 @@ void fragment() {
 		slope = max(slope, 1e-7);
 		float frac = (log(bailout) - logR_prev) / slope;
 		float mu1 = float(count - 1) + clamp(frac, 0.0, 1.0);
-        //COLOR = vec4(!intColoring ? 0.0 : mu1/float(MAX_ITERS), 0.0, 0.0, 1.0);
+        COLOR = vec4(!intColoring ? 0.0 : mu1/float(MAX_ITERS), 0.0, 0.0, 1.0);
 		//if (cycle){
 			//COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 		//}
     } else {
         float t = mu / float(MAX_ITERS);
-        //COLOR   = vec4(blend_pal(t, trap), 1.0);
+        COLOR   = vec4(blend_pal(t, trap), 1.0);
     }
 	//COLOR = vec4(float(count) / float(MAX_ITERS), 0.0, 0.0, 1.0);
 }
