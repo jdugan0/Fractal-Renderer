@@ -781,6 +781,12 @@ typeof(Math).GetMethod(nameof(Math.Abs), new[] { typeof(double) });
             float lo = (float)(d - (double)hi);
             return (hi, lo);
         }
+        public static (Godot.Vector2 hi, Godot.Vector2 lo) SplitComplex(in Complex z)
+        {
+            var (rHi, rLo) = SplitDouble(z.Real);
+            var (iHi, iLo) = SplitDouble(z.Imaginary);
+            return (new Godot.Vector2(rHi, iHi), new Godot.Vector2(rLo, iLo));
+        }
     }
 
 

@@ -13,11 +13,61 @@ vec2 complexAbs(vec2 a) {
 	return vec2(abs(a.x), abs(a.y));
 }
 
+
+
 vec2 real(vec2 a) {
 	return vec2(a.x, 0.0);
 }
 vec2 imag(vec2 a) {
 	return vec2(a.y,0.0);
+}
+
+void two_sum(in float a,in float b,out float s,out float e){
+    s = a + b;
+    float bb = s - a;
+    e = (a - (s - bb)) + (b - bb);
+}
+vec2 two_sum_vec(vec2 a,vec2 b,out vec2 e){
+    vec2 s, d;
+    two_sum(a.x,b.x,s.x,d.x);
+    two_sum(a.y,b.y,s.y,d.y);
+    e = d;
+    return s;
+}
+void add_dl(in vec2 a_hi,in vec2 a_lo,
+            in vec2 b_hi,in vec2 b_lo,
+            out vec2 r_hi,out vec2 r_lo){
+    vec2 e1;      vec2 s1 = two_sum_vec(a_hi,b_hi,e1);
+    vec2 e2;      vec2 s2 = two_sum_vec(s1 ,a_lo,e2);
+    vec2 e3;      r_hi    = two_sum_vec(s2 ,b_lo,e3);
+    r_lo = e1 + e2 + e3;
+}
+void sub_dl(in vec2 a_hi, in vec2 a_lo,
+            in vec2 b_hi, in vec2 b_lo,
+            out vec2 r_hi, out vec2 r_lo) {
+    // Negate B (B_hi and B_lo) for subtraction
+    vec2 neg_b_hi = -b_hi;
+    vec2 neg_b_lo = -b_lo; // Negating the low part is important
+
+    add_dl(a_hi, a_lo, neg_b_hi, neg_b_lo, r_hi, r_lo);
+}
+void complexMul_dl(in vec2 a_hi,in vec2 a_lo,
+                   in vec2 b_hi,in vec2 b_lo,
+                   out vec2 r_hi,out vec2 r_lo){
+    vec2 z_hi = vec2(a_hi.x*b_hi.x - a_hi.y*b_hi.y,
+                     a_hi.x*b_hi.y + a_hi.y*b_hi.x);
+
+    vec2 t1 = vec2(a_hi.x*b_lo.x - a_hi.y*b_lo.y,
+                   a_hi.x*b_lo.y + a_hi.y*b_lo.x);
+    vec2 t2 = vec2(a_lo.x*b_hi.x - a_lo.y*b_hi.y,
+                   a_lo.x*b_hi.y + a_lo.y*b_hi.x);
+    vec2 t3 = vec2(a_lo.x*b_lo.x - a_lo.y*b_lo.y,
+                   a_lo.x*b_lo.y + a_lo.y*b_lo.x);
+
+    vec2 e1;      vec2 s1 = two_sum_vec(t1,t2,e1);
+    vec2 e2;      vec2 s2 = two_sum_vec(z_hi,s1,e2);
+    r_hi = s2;
+    r_lo = e1 + e2 + t3;
 }
 
 vec3 rgb_to_hsv(vec3 c){

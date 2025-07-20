@@ -1,0 +1,11 @@
+[gd_scene load_steps=6 format=3 uid="uid://cmpg0wseyww2d"]
+
+[ext_resource type="Script" uid="uid://b1vafheoyuvi4" path="res://Scripts/SceneSwitcher/SceneSwitcher.cs" id="1_388wc"]
+[ext_resource type="PackedScene" uid="uid://drmawjx4triuj" path="res://Scenes/MainMenu.tscn" id="2_ryrli"]
+[ext_resource type="PackedScene" uid="uid://ca41xtr4e0rvs" path="res://Scenes/ComplexRenderer.tscn" id="3_jg3tv"]
+[ext_resource type="PackedScene" uid="uid://dcspvvrkh8pwn" path="res://Scenes/Mandlebrot.tscn" id="4_jg3tv"]
+[ext_resource type="PackedScene" uid="uid://4ps2lq1e6o73" path="res://Scenes/Newton.tscn" id="5_ipae0"]
+
+[node name="Sceneswitcher" type="Node"]
+script = ExtResource("1_388wc")
+scenes = [ExtResource("2_ryrli"), ExtResource("3_jg3tv"), ExtResource("4_jg3tv"), ExtResource("5_ipae0")]

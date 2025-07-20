@@ -68,7 +68,6 @@ public partial class ViewBase : Sprite2D
     public virtual void PushUniforms()
     {
         if (_mat == null) return;
-        GD.Print(offset);
         _mat.SetShaderParameter("offset", new Godot.Vector2((float)offset.Real, (float)offset.Imaginary));
         _mat.SetShaderParameter("zoomFactor", zoom);
     }
