@@ -1,4 +1,3 @@
-// res://Scripts/ComplexViewBase.cs
 using Godot;
 using System;
 
