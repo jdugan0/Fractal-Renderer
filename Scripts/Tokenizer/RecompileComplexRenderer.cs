@@ -15,6 +15,7 @@ public partial class RecompileComplexRenderer : LineEdit
     bool outside = true;
 
     [Export] public string[] starterFunctions;
+    int starter = 0;
 
     public Func<Complex, Complex, Complex> function;
     public override void _Ready()
@@ -22,7 +23,9 @@ public partial class RecompileComplexRenderer : LineEdit
         oldCode = shader.Shader.Code;
         MouseEntered += () => { outside = false; };
         MouseExited += () => { outside = true; };
-        string func = starterFunctions[GD.Randi() % starterFunctions.Length];
+        starter = (int)(GD.Randi() % starterFunctions.Length);
+        string func = starterFunctions[starter];
+        GD.Print(starter);
         Text = func;
         recompile();
     }
@@ -35,7 +38,16 @@ public partial class RecompileComplexRenderer : LineEdit
         }
         if (Input.IsActionJustPressed("R") && !HasFocus())
         {
-            string func = starterFunctions[GD.Randi() % starterFunctions.Length];
+            if (starter == starterFunctions.Length - 1)
+            {
+                starter = 0;
+            }
+            else
+            {
+                starter++;
+            }
+            GD.Print(starter);
+            string func = starterFunctions[starter];
             Text = func;
             recompile();
         }
