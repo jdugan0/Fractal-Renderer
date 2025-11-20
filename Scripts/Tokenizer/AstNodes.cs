@@ -139,7 +139,6 @@ namespace ExpressionToGLSL
             {
                 "z" => z,
                 "c" => c,
-                "p" => c,
                 _ => throw new NotSupportedException($"Unknown variable {_name}")
             };
         }

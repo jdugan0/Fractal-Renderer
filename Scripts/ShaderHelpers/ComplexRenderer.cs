@@ -39,15 +39,15 @@ public partial class ComplexRenderer : ViewBase
         }
         if (Input.IsActionPressed("Click"))
         {
-            List<Vector2> points = new List<Vector2>();
-            Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-            Vector2 scale = (mouse / _w / zoom) + offset;
-            Complex start = new Complex(scale.X, scale.Y);
+            List<Complex> points = new List<Complex>();
+            Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+            Complex scale = (mouse / _w / zoom) + offset;
+            Complex start = scale;
             List<Vector2> vector2List = new List<Vector2>();
 
             Complex newNumber = compiler.function(start, 0);
-            Complex pointPixel = ((newNumber - new Complex(offset.X, offset.Y)) * zoom * _w);
-            Complex startPoint = ((start - new Complex(offset.X, offset.Y)) * zoom * _w);
+            Complex pointPixel = ((newNumber - offset) * zoom * _w);
+            Complex startPoint = ((start - offset) * zoom * _w);
             vector2List.Add(new Vector2((float)startPoint.Real, (float)startPoint.Imaginary));
             vector2List.Add(new Vector2((float)pointPixel.Real, (float)pointPixel.Imaginary));
             plotter.SetPoints(vector2List);

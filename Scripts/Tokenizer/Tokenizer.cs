@@ -28,10 +28,11 @@ namespace ExpressionToGLSL
                 {
                     _pos++;
                 }
-                else if (TryTokenizeOperator(c, tokens) || 
+                else if (TryTokenizeOperator(c, tokens) ||
                          TryTokenizeVariable(c, tokens) ||
-                         TryTokenizeNumeric(c, tokens) ||
-                         TryTokenizeFunction(tokens))
+                         TryTokenizeStandaloneI(c, tokens) ||
+                         TryTokenizeFunction(tokens) ||
+                         TryTokenizeNumeric(c, tokens))
                 {
                     continue;
                 }
@@ -88,16 +89,20 @@ namespace ExpressionToGLSL
             return false;
         }
 
-        private bool TryTokenizeNumeric(char c, List<Token> tokens)
+        private bool TryTokenizeStandaloneI(char c, List<Token> tokens)
         {
-            if (!char.IsDigit(c) && c != '.' && c != 'i') return false;
-
             if (c == 'i' && IsNextLetterSeparate())
             {
                 tokens.Add(new Token(TokenType.Number, "1.0", true));
                 _pos++;
                 return true;
             }
+            return false;
+        }
+
+        private bool TryTokenizeNumeric(char c, List<Token> tokens)
+        {
+            if (!char.IsDigit(c) && c != '.') return false;
 
             ParseNumber(tokens);
             return true;
@@ -113,7 +118,7 @@ namespace ExpressionToGLSL
             while (_pos < _input.Length)
             {
                 char c = _input[_pos];
-                
+
                 if (char.IsDigit(c))
                 {
                     hasDigits = true;

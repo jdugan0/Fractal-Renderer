@@ -6,7 +6,7 @@ using Vector2 = Godot.Vector2;
 
 public partial class NewtonRenderer : ViewBase
 {
-    List<Vector2> roots = new List<Vector2>();
+    List<Complex> roots = new List<Complex>();
     int color = 0;
     bool hover = false;
     [Export] public int plotterIterations = 250;
@@ -15,9 +15,9 @@ public partial class NewtonRenderer : ViewBase
     public override void _Ready()
     {
         base._Ready();
-        roots.Add(new Vector2(0, 0));
-        roots.Add(new Vector2(0, 1));
-        roots.Add(new Vector2(1, 0));
+        roots.Add(new Complex(0, 0));
+        roots.Add(new Complex(0, 1));
+        roots.Add(new Complex(1, 0));
     }
     public override void _UnhandledInput(InputEvent @event)
     {
@@ -25,8 +25,8 @@ public partial class NewtonRenderer : ViewBase
         {
             return;
         }
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
+        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
         if (@event.IsActionPressed("Click"))
         {
             roots.Add(scale);
@@ -43,14 +43,15 @@ public partial class NewtonRenderer : ViewBase
 
     }
 
-    public void ToggleFancy(bool toggle) {
+    public void ToggleFancy(bool toggle)
+    {
         fancy = toggle;
     }
 
     public override void HandleInput(double delta)
     {
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
+        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
         base.HandleInput(delta);
         if (pauseMenu.paused)
         {
@@ -70,15 +71,15 @@ public partial class NewtonRenderer : ViewBase
         {
             List<Vector2> points = new List<Vector2>();
 
-            Complex z = new Complex(scale.X, scale.Y);
+            Complex z = scale;
             for (int i = 0; i < plotterIterations; i++)
             {
                 points.Add(ComplexToScreen(z));
                 Complex f = Complex.One;
                 Complex sum = Complex.Zero;
-                foreach (Vector2 r in roots)
+                foreach (Complex r in roots)
                 {
-                    Complex diff = z - new Complex(r.X, r.Y);
+                    Complex diff = z - r;
                     f *= diff;
                     sum += Complex.One / diff;
                 }
@@ -99,7 +100,7 @@ public partial class NewtonRenderer : ViewBase
 
     private Vector2 ComplexToScreen(Complex z)
     {
-        Complex zp = (z - new Complex(offset.X, offset.Y)) * zoom * _w;
+        Complex zp = (z - offset) * zoom * _w;
         return new Vector2((float)zp.Real, (float)zp.Imaginary);
     }
 
@@ -120,7 +121,7 @@ public partial class NewtonRenderer : ViewBase
         Vector2[] list = new Vector2[100];
         for (int i = 0; i < roots.Count && i < 100; i++)
         {
-            list[i] = roots[i];
+            list[i] = complexToVec(roots[i]);
         }
         _mat.SetShaderParameter("roots", list);
         _mat.SetShaderParameter("idClose", id);
@@ -130,15 +131,15 @@ public partial class NewtonRenderer : ViewBase
     }
     public int findClosest()
     {
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
-        float best = float.MaxValue;
+        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
+        double best = double.MaxValue;
         int id = -1;
         for (int i = 0; i < roots.Count; i++)
         {
-            if (roots[i].DistanceTo(scale) < best)
+            if ((roots[i] - scale).Magnitude < best)
             {
-                best = roots[i].DistanceTo(scale);
+                best = (roots[i] - scale).Magnitude;
                 id = i;
             }
         }

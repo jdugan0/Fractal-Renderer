@@ -8,7 +8,7 @@ public partial class MandlebrotRenderer : ViewBase
 {
     [Export] public LineEdit TextEdit;
 
-    public Vector2 juliaPoint;
+    public Complex juliaPoint;
 
     public bool julia = false;
     [Export] public int plotterIterations = 250;
@@ -25,7 +25,8 @@ public partial class MandlebrotRenderer : ViewBase
         {
             return;
         }
-        if (!julia){
+        if (!julia)
+        {
             juliaFromBox = false;
         }
         if (Input.IsActionJustPressed("RightClick"))
@@ -33,8 +34,8 @@ public partial class MandlebrotRenderer : ViewBase
             julia = !julia;
             juliaBox.SetPressedNoSignal(julia);
         }
-        Vector2 mouse = GetViewport().GetMousePosition() + new Vector2(-_w / 2, -_h / 2);
-        Vector2 scale = (mouse / _w / zoom) + offset;
+        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex scale = (mouse / _w / zoom) + offset;
         if (Input.IsActionPressed("RightClick") || juliaFromBox)
         {
             juliaPoint = scale;
@@ -44,18 +45,17 @@ public partial class MandlebrotRenderer : ViewBase
         {
             List<Vector2> points = new List<Vector2>();
             Complex start = new Complex();
-            Complex c = new Complex(scale.X, scale.Y);
+            Complex c = scale;
             if (julia)
             {
-                start = new Complex(scale.X, scale.Y);
-                c = new Complex(juliaPoint.X, juliaPoint.Y);
+                start = scale;
+                c = juliaPoint;
             }
             Complex previous = compiler.function(start, c);
             for (int i = 0; i < plotterIterations; i++)
             {
-                Complex pointPixel = ((previous - new Complex(offset.X, offset.Y))
-                * zoom * _w);
-                Vector2 point = new Vector2((float)pointPixel.Real, (float)pointPixel.Imaginary);
+                Complex pointPixel = (previous - offset) * zoom * _w;
+                Vector2 point = complexToVec(pointPixel);
                 points.Add(point);
                 previous = compiler.function(previous, c);
             }
@@ -68,19 +68,21 @@ public partial class MandlebrotRenderer : ViewBase
         base.HandleInput(delta);
     }
 
-    public void ToggleJulia(bool toggle){
+    public void ToggleJulia(bool toggle)
+    {
 
         julia = toggle;
         juliaFromBox = true;
     }
-    public void ToggleIntColor(bool toggle){
+    public void ToggleIntColor(bool toggle)
+    {
         intColor = toggle;
     }
     public override void PushUniforms()
     {
         base.PushUniforms();
         _mat.SetShaderParameter("julia", julia);
-        _mat.SetShaderParameter("juliaPoint", juliaPoint);
+        _mat.SetShaderParameter("juliaPoint", complexToVec(juliaPoint));
         _mat.SetShaderParameter("intColoring", intColor);
     }
 }

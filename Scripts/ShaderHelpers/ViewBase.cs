@@ -1,11 +1,12 @@
 using Godot;
 using System;
+using System.Numerics;
 
 public partial class ViewBase : Sprite2D
 {
-    [Export] public float speed = 1f;
-    public Vector2 offset = Vector2.Zero;
-    public float zoom = 0.1f;
+    [Export] public double speed = 1;
+    public Complex offset = Complex.Zero;
+    public double zoom = 0.1;
 
     [Export] public PauseMenu pauseMenu;
 
@@ -46,24 +47,38 @@ public partial class ViewBase : Sprite2D
         {
             return;
         }
-        Vector2 v = Vector2.Zero;
-        if (Input.IsActionPressed("UP")) v += Vector2.Up;
-        if (Input.IsActionPressed("DOWN")) v += Vector2.Down;
-        if (Input.IsActionPressed("LEFT")) v += Vector2.Left;
-        if (Input.IsActionPressed("RIGHT")) v += Vector2.Right;
+        Complex v = Complex.Zero;
+        if (Input.IsActionPressed("UP")) v += -Complex.ImaginaryOne;
+        if (Input.IsActionPressed("DOWN")) v += Complex.ImaginaryOne;
+        if (Input.IsActionPressed("LEFT")) v += -Complex.One;
+        if (Input.IsActionPressed("RIGHT")) v += Complex.One;
 
-        if (Input.IsActionPressed("ZoomIn")) zoom += (float)(delta) * zoom;
-        if (Input.IsActionPressed("ZoomOut")) zoom -= (float)(delta) * zoom;
-        if (Input.IsActionJustPressed("Home")) { offset = Vector2.Zero; zoom = 0.1f; }
+        if (Input.IsActionPressed("ZoomIn")) zoom += (delta) * zoom;
+        if (Input.IsActionPressed("ZoomOut")) zoom -= (delta) * zoom;
+        if (Input.IsActionJustPressed("Home")) { offset = Complex.Zero; zoom = 0.1f; }
 
         zoom = Mathf.Clamp(zoom, 1e-32f, 1e9f);
-        offset += v.Normalized() * (float)delta / zoom * speed;
+        if (v.Magnitude > 0)
+        {
+            offset += v / v.Magnitude * delta / zoom * speed;
+        }
     }
 
     public virtual void PushUniforms()
     {
         if (_mat == null) return;
-        _mat.SetShaderParameter("offset", offset);
-        _mat.SetShaderParameter("zoomFactor", zoom);
+        _mat.SetShaderParameter("offset", complexToVec(offset));
+        _mat.SetShaderParameter("zoomFactor", (float)zoom);
+    }
+
+    public Godot.Vector2 complexToVec(Complex c)
+    {
+        Godot.Vector2 v = new Godot.Vector2((float)c.Real, (float)c.Imaginary);
+        return v;
+    }
+
+    public Complex vecToComplex(Godot.Vector2 vector)
+    {
+        return new Complex(vector.X, vector.Y);
     }
 }

@@ -70,6 +70,7 @@ public partial class RecompileComplexRenderer : LineEdit
 
             AddThemeStyleboxOverride("normal", styleBox);
             // GD.PushError(e);
+            GD.Print(e.Message);
         }
 
     }
