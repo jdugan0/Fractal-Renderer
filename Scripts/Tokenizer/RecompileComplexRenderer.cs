@@ -47,7 +47,7 @@ public partial class RecompileComplexRenderer : LineEdit
         {
             String glsl = ExpressionToGLSL.ExpressionParser.ConvertExpressionToGlsl(Text, useC);
             String code = oldCode;
-            code = code.Replace("vec2(0.00)", glsl);
+            code = code.Replace("vec4(0.00)", glsl);
 
             var shaderNew = new Godot.Shader();
             shaderNew.Code = code;

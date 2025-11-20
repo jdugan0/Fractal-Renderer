@@ -1,3 +1,4 @@
+using ExpressionToGLSL;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ public partial class MandlebrotRenderer : ViewBase
             julia = !julia;
             juliaBox.SetPressedNoSignal(julia);
         }
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse = HelperMath.VecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         if (Input.IsActionPressed("RightClick") || juliaFromBox)
         {
@@ -55,7 +56,7 @@ public partial class MandlebrotRenderer : ViewBase
             for (int i = 0; i < plotterIterations; i++)
             {
                 Complex pointPixel = (previous - offset) * zoom * _w;
-                Vector2 point = complexToVec(pointPixel);
+                Vector2 point = HelperMath.ComplexToVec(pointPixel);
                 points.Add(point);
                 previous = compiler.function(previous, c);
             }
@@ -82,7 +83,8 @@ public partial class MandlebrotRenderer : ViewBase
     {
         base.PushUniforms();
         _mat.SetShaderParameter("julia", julia);
-        _mat.SetShaderParameter("juliaPoint", complexToVec(juliaPoint));
+        _mat.SetShaderParameter("juliaPoint_hi", HelperMath.SplitVec(juliaPoint).hi);
+        _mat.SetShaderParameter("juliaPoint_lo", HelperMath.SplitVec(juliaPoint).lo);
         _mat.SetShaderParameter("intColoring", intColor);
     }
 }

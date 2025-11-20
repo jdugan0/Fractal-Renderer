@@ -1,3 +1,4 @@
+using ExpressionToGLSL;
 using Godot;
 using System;
 using System.Numerics;
@@ -67,18 +68,9 @@ public partial class ViewBase : Sprite2D
     public virtual void PushUniforms()
     {
         if (_mat == null) return;
-        _mat.SetShaderParameter("offset", complexToVec(offset));
-        _mat.SetShaderParameter("zoomFactor", (float)zoom);
-    }
-
-    public Godot.Vector2 complexToVec(Complex c)
-    {
-        Godot.Vector2 v = new Godot.Vector2((float)c.Real, (float)c.Imaginary);
-        return v;
-    }
-
-    public Complex vecToComplex(Godot.Vector2 vector)
-    {
-        return new Complex(vector.X, vector.Y);
+        _mat.SetShaderParameter("offset_hi", HelperMath.SplitVec(offset).hi);
+        _mat.SetShaderParameter("offset_lo", HelperMath.SplitVec(offset).lo);
+        _mat.SetShaderParameter("zoomFactor_hi", HelperMath.SplitDouble(zoom).hi);
+        _mat.SetShaderParameter("zoomFactor_lo", HelperMath.SplitDouble(zoom).lo);
     }
 }

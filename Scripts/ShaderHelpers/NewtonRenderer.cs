@@ -1,3 +1,4 @@
+using ExpressionToGLSL;
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ public partial class NewtonRenderer : ViewBase
         {
             return;
         }
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse = HelperMath.VecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         if (@event.IsActionPressed("Click"))
         {
@@ -50,7 +51,7 @@ public partial class NewtonRenderer : ViewBase
 
     public override void HandleInput(double delta)
     {
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse = HelperMath.VecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         base.HandleInput(delta);
         if (pauseMenu.paused)
@@ -121,7 +122,7 @@ public partial class NewtonRenderer : ViewBase
         Vector2[] list = new Vector2[100];
         for (int i = 0; i < roots.Count && i < 100; i++)
         {
-            list[i] = complexToVec(roots[i]);
+            list[i] = HelperMath.ComplexToVec(roots[i]);
         }
         _mat.SetShaderParameter("roots", list);
         _mat.SetShaderParameter("idClose", id);
@@ -131,7 +132,7 @@ public partial class NewtonRenderer : ViewBase
     }
     public int findClosest()
     {
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse = HelperMath.VecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         double best = double.MaxValue;
         int id = -1;
