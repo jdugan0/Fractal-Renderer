@@ -1,19 +1,16 @@
 shader_type canvas_item;
 #include "res://Scripts/Shaders/ComplexMath.gdshaderinc"
-uniform vec2 offset_hi = vec2(0.0,0.0);
-uniform vec2 offset_lo = vec2(0.0,0.0);
-uniform float zoomFactor_hi = 0.1;
-uniform float zoomFactor_lo = 0;
+uniform vec2 offset = vec2(0.0,0.0);
+uniform float zoomFactor = 0.1;
 
-uniform vec2 juliaPoint_hi = vec2(0.0, 0.0);
-uniform vec2 juliaPoint_lo = vec2(0.0, 0.0);
+uniform vec2 juliaPoint = vec2(0.0, 0.0);
 uniform bool julia = false;
 
 uniform bool intColoring = false;
 
 
-vec4 func(vec4 z, vec4 c) {
-	vec4 result = vec4(0.00);
+vec2 func(vec2 z, vec2 c) {
+	vec2 result = vec2(0.00);
     return result;
 }
 vec3 palette(float t){
@@ -36,31 +33,31 @@ bool non_finite(vec2 v) {
 
 void fragment() {
     vec2 res = vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y);
-	vec2 zoomFactor = vec2(zoomFactor_hi, zoomFactor_lo);
-	vec4 offset = vec4(offset_hi, offset_lo);
-    vec4 c = transformHiLo(vec2(UV.x/SCREEN_PIXEL_SIZE.x, UV.y/SCREEN_PIXEL_SIZE.y), res, zoomFactor, offset);
-	vec4 start = vec4(0.0, 0.0, 0.0, 0.0);
+    vec2 c   = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
+                              UV.y/SCREEN_PIXEL_SIZE.y),
+                         res, zoomFactor, offset);
+	vec2 start = vec2(0.0, 0.0);
 	if (julia) {
 		start = c;
 		c = juliaPoint;
 	}
-    vec4 z = func(start, c);
+    vec2 z = func(start, c);
 
-    float trap = 1e20;
-    float mu = 0.0;
-    bool  esc = false;
-    bool  cycle = false;
+    float trap     = 1e20;
+    float mu       = 0.0;
+    bool  esc      = false;
+    bool  cycle    = false;
 
     const int MAX_ITERS = 250;
     const int MIN_ITERS = 20;
 	bool mu_lock = false;
 
-    float bailout = 256.0;
+    float bailout  = 256.0;
     float eps = 1e-5;   // tolerance for “same value”
 
-    vec4 tortoise = z;  // reference point
-    int  power = 1;  // when to move the reference
-    int  lam = 0;  // distance travelled since last reset
+    vec2 tortoise  = z;  // reference point
+    int  power     = 1;  // when to move the reference
+    int  lam       = 0;  // distance travelled since last reset
 	int count;
 	const int PERIOD = 20;
 	vec2 z_prev = z;
@@ -71,12 +68,13 @@ void fragment() {
         /* normal fractal iteration */
         z = func(z, c);
 
-		if (lengthHiLo(z, z_prev) < eps) {
+		if (length(z - z_prev) < eps) {
             cycle = true;
             break;
         }
-        vec2 r2 = lengthHiLoSq(z,c);
-        trap = min(trap, r2);
+        vec2 delta = z - c;
+        float r2   = dot(delta, delta);
+        trap       = min(trap, r2);
 
 		if (non_finite(z)) {
 	        esc = true;

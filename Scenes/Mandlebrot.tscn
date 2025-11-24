@@ -9,12 +9,22 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pbp4u"]
 shader = ExtResource("2_lo45j")
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/zoomFactor = 0.1
+shader_parameter/juliaPoint = Vector2(0, 0)
+shader_parameter/julia = false
+shader_parameter/intColoring = false
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lo45j"]
 bg_color = Color(0.647059, 0.701961, 0.776471, 0.780392)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8cjuv"]
 shader = ExtResource("2_lo45j")
+shader_parameter/offset = Vector2(0, 0)
+shader_parameter/zoomFactor = 0.1
+shader_parameter/juliaPoint = Vector2(0, 0)
+shader_parameter/julia = false
+shader_parameter/intColoring = false
 
 [node name="ComplexRenderer" type="Node2D"]
 
