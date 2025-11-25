@@ -1,16 +1,19 @@
 shader_type canvas_item;
-#include "res://Scripts/Shaders/ComplexMath.gdshaderinc"
-uniform vec2 offset = vec2(0.0,0.0);
-uniform float zoomFactor = 0.1;
+#include "res://Scripts/Shaders/HiLoMath.gdshaderinc"
+uniform vec2 offset_hi = vec2(0.0,0.0);
+uniform vec2 offset_lo = vec2(0.0,0.0);
+uniform float zoomFactor_hi = 0.1;
+uniform float zoomFactor_lo = 0.1;
 
-uniform vec2 juliaPoint = vec2(0.0, 0.0);
+uniform vec2 juliaPoint_hi = vec2(0.0, 0.0);
+uniform vec2 juliaPoint_lo = vec2(0.0, 0.0);
 uniform bool julia = false;
 
 uniform bool intColoring = false;
 
 
-vec2 func(vec2 z, vec2 c) {
-	vec2 result = vec2(0.00);
+vec4 func(vec4 z, vec4 c) {
+	vec4 result = vec4(0.00);
     return result;
 }
 vec3 palette(float t){
@@ -31,36 +34,44 @@ bool non_finite(vec2 v) {
     return any(isnan(v)) || any(isinf(v));
 }
 
+bool non_finite4(vec4 v) {
+    return any(isnan(v)) || any(isinf(v));
+}
+
+
 void fragment() {
-    vec2 res = vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y);
-    vec2 c   = transform(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
-                              UV.y/SCREEN_PIXEL_SIZE.y),
+	vec2 zoomFactor = vec2(zoomFactor_hi, zoomFactor_lo);
+	vec4 offset = vec4(offset_hi, offset_lo);
+	vec4 juliaPoint = vec4(juliaPoint_hi, juliaPoint_lo);
+    vec4 res = toHiLoVec2(vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y));
+    vec4 c = transformHiLo(toHiLoVec2(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
+                              UV.y/SCREEN_PIXEL_SIZE.y)),
                          res, zoomFactor, offset);
-	vec2 start = vec2(0.0, 0.0);
+	vec4 start = vec4(0.0);
 	if (julia) {
 		start = c;
 		c = juliaPoint;
 	}
-    vec2 z = func(start, c);
+    vec4 z = func(start, c);
 
-    float trap     = 1e20;
-    float mu       = 0.0;
-    bool  esc      = false;
-    bool  cycle    = false;
+    vec2 trap = splitFloat(1e20);
+    vec2 mu = vec2(0.0);
+    bool esc = false;
+    bool cycle = false;
 
     const int MAX_ITERS = 250;
     const int MIN_ITERS = 20;
 	bool mu_lock = false;
 
-    float bailout  = 256.0;
-    float eps = 1e-5;   // tolerance for “same value”
+    vec2 bailout = splitFloat(256.0);
+    vec2 eps = splitFloat(1e-5);   // tolerance for “same value”
 
-    vec2 tortoise  = z;  // reference point
-    int  power     = 1;  // when to move the reference
-    int  lam       = 0;  // distance travelled since last reset
+    vec4 tortoise = z;  // reference point
+    int power = 1;  // when to move the reference
+    int lam = 0;  // distance travelled since last reset
 	int count;
 	const int PERIOD = 20;
-	vec2 z_prev = z;
+	vec4 z_prev = z;
 	int pcount = 0;
 
     for (int i = 0; i < MAX_ITERS; ++i) {
@@ -68,31 +79,31 @@ void fragment() {
         /* normal fractal iteration */
         z = func(z, c);
 
-		if (length(z - z_prev) < eps) {
+		if (ltHiLo(magHiLo(z - z_prev), eps)) {
             cycle = true;
             break;
         }
-        vec2 delta = z - c;
-        float r2   = dot(delta, delta);
-        trap       = min(trap, r2);
+        vec4 delta = subHiLo4(z, c);
+        vec2 r2 = magSqHiLo(delta);
+        trap = minHiLo(trap, r2);
 
-		if (non_finite(z)) {
+		if (non_finite4(z)) {
 	        esc = true;
 	        if (!mu_lock){
-				mu  = float(i);
+				mu = splitFloat(float(i));
 			}
 	        break;
     	}
 
 
-        if (r2 > bailout) {
+        if (gtHiLo(r2, bailout)) {
 			if (!mu_lock){
-				float logR_prev = log(length(z_prev));
-				float logR_curr = log(length(z));
-				float slope = logR_curr - logR_prev;
-				slope = max(slope, 1e-7);
-				float frac = (log(bailout) - logR_prev) / slope;
-				mu = float(i - 1) + clamp(frac, 0.0, 1.0);
+				vec2 logR_prev = logHiLo(magHiLo(z_prev));
+				vec2 logR_curr = logHiLo(magHiLo(z));
+				vec2 slope = subHiLo(logR_curr, logR_prev);
+				slope = maxHiLo(slope, splitFloat(1e-7));
+				vec2 frac = divHiLo((subHiLo(logHiLo(bailout), logR_prev)), slope);
+				mu = addHiLo(splitFloat(float(i - 1)), clampHiLo(frac, splitFloat(0.0), splitFloat(1.0)));
 				mu_lock = true;
 			}
 			if (i > MIN_ITERS){
@@ -100,14 +111,12 @@ void fragment() {
            		break;
 			}
         }
-
-
         ++lam;
-        if (dot(z - tortoise, z - tortoise) < eps*eps) {
+		vec4 tortoiseDelta = subHiLo4(z, tortoise);
+        if (ltHiLo(magSqHiLo(tortoiseDelta), multHiLo(eps, eps))) {
             cycle = true;
-            break;              // found a repeat → interior / attractive cycle
+            break;
         }
-
         if (lam == power) {     // time to shift the reference forward
             tortoise = z;
             power   <<= 1;      // power *= 2
@@ -117,19 +126,19 @@ void fragment() {
     }
 
     if (!esc) {
-		float logR_prev = log(length(z_prev));
-		float logR_curr = log(length(z));
-		float slope = logR_curr - logR_prev;
-		slope = max(slope, 1e-7);
-		float frac = (log(bailout) - logR_prev) / slope;
-		float mu1 = float(count - 1) + clamp(frac, 0.0, 1.0);
-        COLOR = vec4(!intColoring ? 0.0 : mu1/float(MAX_ITERS), 0.0, 0.0, 1.0);
+		vec2 logR_prev = logHiLo(magHiLo(z_prev));
+		vec2 logR_curr = logHiLo(magHiLo(z));
+		vec2 slope = subHiLo(logR_curr, logR_prev);
+		slope = maxHiLo(slope, splitFloat(1e-7));
+		vec2 frac = divHiLo((subHiLo(logHiLo(bailout), logR_prev)), slope);
+		vec2 mu1 = addHiLo(splitFloat(float(count - 1)), clampHiLo(frac, splitFloat(0.0), splitFloat(1.0)));
+        COLOR = vec4(!intColoring ? 0.0 : (mu1.x + mu1.y)/float(MAX_ITERS), 0.0, 0.0, 1.0);
 		//if (cycle){
 			//COLOR = vec4(1.0, 1.0, 1.0, 1.0);
 		//}
     } else {
-        float t = mu / float(MAX_ITERS);
-        COLOR   = vec4(blend_pal(t, trap), 1.0);
+        float t = (mu.x + mu.y) / float(MAX_ITERS);
+        COLOR = vec4(blend_pal(t, trap.x + trap.y), 1.0);
     }
 	//COLOR = vec4(float(count) / float(MAX_ITERS), 0.0, 0.0, 1.0);
 }

@@ -81,7 +81,7 @@ namespace ExpressionToGLSL
         public override string ToGlsl()
         {
             return _isNegative
-                ? $"complexMult(vec2(-1.0, 0.0), {_child.ToGlsl()})"
+                ? $"complexMult(vec4(splitFloat(-1.0), splitFloat(0.0)), {_child.ToGlsl()})"
                 : _child.ToGlsl();
         }
 
@@ -111,8 +111,8 @@ namespace ExpressionToGLSL
         {
             string val = _value.ToString("G", CultureInfo.InvariantCulture);
             return _isImaginary
-                ? $"vec2(0.0, {val})"
-                : $"vec2({val}, 0.0)";
+                ? $"vec4(splitFloat(0.0), splitFloat({val}))"
+                : $"vec4(splitFloat({val}), splitFloat(0.0))";
         }
 
         public override Expression ToExpression(ParameterExpression z, ParameterExpression c)

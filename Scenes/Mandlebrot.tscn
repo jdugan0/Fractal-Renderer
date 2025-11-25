@@ -9,9 +9,12 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pbp4u"]
 shader = ExtResource("2_lo45j")
-shader_parameter/offset = Vector2(0, 0)
-shader_parameter/zoomFactor = 0.1
-shader_parameter/juliaPoint = Vector2(0, 0)
+shader_parameter/offset_hi = Vector2(0, 0)
+shader_parameter/offset_lo = Vector2(0, 0)
+shader_parameter/zoomFactor_hi = 0.1
+shader_parameter/zoomFactor_lo = 0.1
+shader_parameter/juliaPoint_hi = Vector2(0, 0)
+shader_parameter/juliaPoint_lo = Vector2(0, 0)
 shader_parameter/julia = false
 shader_parameter/intColoring = false
 
@@ -20,9 +23,12 @@ bg_color = Color(0.647059, 0.701961, 0.776471, 0.780392)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_8cjuv"]
 shader = ExtResource("2_lo45j")
-shader_parameter/offset = Vector2(0, 0)
-shader_parameter/zoomFactor = 0.1
-shader_parameter/juliaPoint = Vector2(0, 0)
+shader_parameter/offset_hi = Vector2(0, 0)
+shader_parameter/offset_lo = Vector2(0, 0)
+shader_parameter/zoomFactor_hi = 0.1
+shader_parameter/zoomFactor_lo = 0.1
+shader_parameter/juliaPoint_hi = Vector2(0, 0)
+shader_parameter/juliaPoint_lo = Vector2(0, 0)
 shader_parameter/julia = false
 shader_parameter/intColoring = false
 

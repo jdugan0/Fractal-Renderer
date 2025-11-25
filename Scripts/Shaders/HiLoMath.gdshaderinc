@@ -88,3 +88,152 @@ vec2 magSqHiLo(vec4 a) {
 
     return addHiLo(ax2, ay2);
 }
+vec4 subHiLo4(vec4 a, vec4 b) {
+    vec2 ax = a.xy;
+    vec2 ay = a.zw;
+    vec2 bx = b.xy;
+    vec2 by = b.zw;
+
+    vec2 rx = subHiLo(ax, bx);
+    vec2 ry = subHiLo(ay, by);
+
+    return vec4(rx, ry);
+}
+vec2 minHiLo(vec2 a, vec2 b) {
+    bool useA = (a.x < b.x) || (a.x == b.x && a.y <= b.y);
+    return useA ? a : b;
+}
+bool gtHiLo(vec2 a, vec2 b) {
+    return (a.x > b.x) || (a.x == b.x && a.y > b.y);
+}
+vec2 sqrtHiLo(vec2 a) {
+    float x0 = inversesqrt(a.x);
+    float y0 = 1.0 / x0;
+
+    vec2 y = vec2(y0, 0.0);
+    vec2 y2 = multHiLo(y, y);
+    vec2 t = subHiLo(a, multHiLo(y2, y));
+    vec2 dy = multHiLo(t, multHiLo(vec2(0.5,0.0), y));
+
+    return addHiLo(y, dy);
+}
+
+vec2 magHiLo(vec4 a) {
+    vec2 ax = a.xy;
+    vec2 ay = a.zw;
+
+    vec2 ax2 = multHiLo(ax, ax);
+    vec2 ay2 = multHiLo(ay, ay);
+    vec2 s = addHiLo(ax2, ay2);
+
+    return sqrtHiLo(s);
+}
+vec2 logHiLo(vec2 a) {
+    float x = a.x + a.y;
+    float e = floor(log2(x));
+    float m = x * exp2(-e);
+
+    vec2 m_dd = splitFloat(m);
+    vec2 ln_m = subHiLo(
+        splitFloat(log(m)),
+        subHiLo(a, m_dd)
+    );
+
+    vec2 ln2_dd = splitFloat(log(2.0));
+    vec2 e_dd = splitFloat(e);
+
+    vec2 term_e = multHiLo(ln2_dd, e_dd);
+    return addHiLo(ln_m, term_e);
+}
+bool ltHiLo(vec2 a, vec2 b) {
+    return (a.x < b.x) || (a.x == b.x && a.y < b.y);
+}
+vec2 clampHiLo(vec2 v, vec2 lo, vec2 hi) {
+    vec2 m = maxHiLo(v, lo);
+    return minHiLo(m, hi);
+}
+vec4 complexAdd(vec4 a, vec4 b) {
+    vec2 rx = addHiLo(a.xy, b.xy);
+    vec2 ry = addHiLo(a.zw, b.zw);
+    return vec4(rx, ry);
+}
+vec4 complexSub(vec4 a, vec4 b) {
+    vec2 rx = subHiLo(a.xy, b.xy);
+    vec2 ry = subHiLo(a.zw, b.zw);
+    return vec4(rx, ry);
+}
+vec4 complexMult(vec4 a, vec4 b) {
+    vec2 ax = a.xy;
+    vec2 ay = a.zw;
+    vec2 bx = b.xy;
+    vec2 by = b.zw;
+
+    vec2 xu = multHiLo(ax, bx);
+    vec2 yv = multHiLo(ay, by);
+    vec2 xv = multHiLo(ax, by);
+    vec2 yu = multHiLo(ay, bx);
+
+    vec2 real = subHiLo(xu, yv);
+    vec2 imag = addHiLo(xv, yu);
+
+    return vec4(real, imag);
+}
+vec4 complexDivide(vec4 a, vec4 b) {
+    vec2 bx = b.xy;
+    vec2 by = b.zw;
+
+    vec2 bx2 = multHiLo(bx, bx);
+    vec2 by2 = multHiLo(by, by);
+    vec2 denom = addHiLo(bx2, by2);
+
+    vec2 real_num = addHiLo(multHiLo(a.xy, bx), multHiLo(a.zw, by));
+    vec2 imag_num = subHiLo(multHiLo(a.zw, bx), multHiLo(a.xy, by));
+
+    vec2 real = divHiLo(real_num, denom);
+    vec2 imag = divHiLo(imag_num, denom);
+
+    return vec4(real, imag);
+}
+vec2 expHiLo(vec2 a) {
+    float ex = exp(a.x);
+    vec2 ex_dd = splitFloat(ex);
+    vec2 corr = multHiLo(ex_dd, vec2(a.y, 0.0));
+    return addHiLo(ex_dd, corr);
+}
+vec4 complex_pow_complex(vec4 z, vec4 w) {
+    vec2 zx = z.xy;
+    vec2 zy = z.zw;
+    vec2 wx = w.xy;
+    vec2 wy = w.zw;
+
+    vec2 zx2 = multHiLo(zx, zx);
+    vec2 zy2 = multHiLo(zy, zy);
+    vec2 r2  = addHiLo(zx2, zy2);
+    vec2 r   = sqrtHiLo(r2);
+
+    float x = zx.x + zx.y;
+    float y = zy.x + zy.y;
+    float theta = atan(y, x);
+
+    vec2 ln_r = logHiLo(r);
+    vec2 theta_dd = splitFloat(theta);
+
+    vec2 a_ln_r = multHiLo(wx, ln_r);
+    vec2 b_theta = multHiLo(wy, theta_dd);
+    vec2 real_part = subHiLo(a_ln_r, b_theta);
+
+    vec2 a_theta = multHiLo(wx, theta_dd);
+    vec2 b_ln_r = multHiLo(wy, ln_r);
+    vec2 imag_part = addHiLo(a_theta, b_ln_r);
+
+    vec2 mag = expHiLo(real_part);
+
+    float angle = imag_part.x + imag_part.y;
+    vec2 cos_ang = splitFloat(cos(angle));
+    vec2 sin_ang = splitFloat(sin(angle));
+
+    vec2 real = multHiLo(mag, cos_ang);
+    vec2 imag = multHiLo(mag, sin_ang);
+
+    return vec4(real, imag);
+}
