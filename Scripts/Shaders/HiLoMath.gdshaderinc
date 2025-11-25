@@ -107,16 +107,43 @@ bool gtHiLo(vec2 a, vec2 b) {
     return (a.x > b.x) || (a.x == b.x && a.y > b.y);
 }
 vec2 sqrtHiLo(vec2 a) {
-    float x0 = inversesqrt(a.x);
-    float y0 = 1.0 / x0;
+    // Handle zero explicitly
+    if (a.x == 0.0 && a.y == 0.0) {
+        return vec2(0.0, 0.0);
+    }
 
+    float y0 = sqrt(a.x);
     vec2 y = vec2(y0, 0.0);
-    vec2 y2 = multHiLo(y, y);
-    vec2 t = subHiLo(a, multHiLo(y2, y));
-    vec2 dy = multHiLo(t, multHiLo(vec2(0.5,0.0), y));
 
+    vec2 y2 = multHiLo(y, y);
+    vec2 r  = subHiLo(a, y2);
+
+    vec2 two  = vec2(2.0, 0.0);
+    vec2 denom = multHiLo(two, y);
+
+    // If denom is numerically zero, just return the initial sqrt
+    if (denom.x == 0.0 && denom.y == 0.0) {
+        return y;
+    }
+
+    vec2 dy = divHiLo(r, denom);
     return addHiLo(y, dy);
 }
+
+vec2 logHiLo(vec2 a) {
+    float x = a.x + a.y;
+
+    // Clamp away from non-positive to avoid log(0) and log(<0)
+    const float MIN_POS = 1e-38;
+    x = max(x, MIN_POS);
+
+    float ln_x = log(x);
+    vec2 x_dd = splitFloat(x);
+    vec2 dx = subHiLo(a, x_dd);
+    vec2 corr = divHiLo(dx, x_dd);
+    return addHiLo(splitFloat(ln_x), corr);
+}
+
 
 vec2 magHiLo(vec4 a) {
     vec2 ax = a.xy;
@@ -128,23 +155,8 @@ vec2 magHiLo(vec4 a) {
 
     return sqrtHiLo(s);
 }
-vec2 logHiLo(vec2 a) {
-    float x = a.x + a.y;
-    float e = floor(log2(x));
-    float m = x * exp2(-e);
 
-    vec2 m_dd = splitFloat(m);
-    vec2 ln_m = subHiLo(
-        splitFloat(log(m)),
-        subHiLo(a, m_dd)
-    );
 
-    vec2 ln2_dd = splitFloat(log(2.0));
-    vec2 e_dd = splitFloat(e);
-
-    vec2 term_e = multHiLo(ln2_dd, e_dd);
-    return addHiLo(ln_m, term_e);
-}
 bool ltHiLo(vec2 a, vec2 b) {
     return (a.x < b.x) || (a.x == b.x && a.y < b.y);
 }
@@ -205,11 +217,16 @@ vec4 complex_pow_complex(vec4 z, vec4 w) {
     vec2 zy = z.zw;
     vec2 wx = w.xy;
     vec2 wy = w.zw;
+	
+	bool z_is_zero = (zx.x == 0.0 && zx.y == 0.0 && zy.x == 0.0 && zy.y == 0.0);
+    if (z_is_zero) {
+        return vec4(0.0);
+    }
 
     vec2 zx2 = multHiLo(zx, zx);
     vec2 zy2 = multHiLo(zy, zy);
-    vec2 r2  = addHiLo(zx2, zy2);
-    vec2 r   = sqrtHiLo(r2);
+    vec2 r2 = addHiLo(zx2, zy2);
+    vec2 r = sqrtHiLo(r2);
 
     float x = zx.x + zx.y;
     float y = zy.x + zy.y;

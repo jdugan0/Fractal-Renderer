@@ -3,7 +3,7 @@ shader_type canvas_item;
 uniform vec2 offset_hi = vec2(0.0,0.0);
 uniform vec2 offset_lo = vec2(0.0,0.0);
 uniform float zoomFactor_hi = 0.1;
-uniform float zoomFactor_lo = 0.1;
+uniform float zoomFactor_lo = 0;
 
 uniform vec2 juliaPoint_hi = vec2(0.0, 0.0);
 uniform vec2 juliaPoint_lo = vec2(0.0, 0.0);
@@ -41,8 +41,8 @@ bool non_finite4(vec4 v) {
 
 void fragment() {
 	vec2 zoomFactor = vec2(zoomFactor_hi, zoomFactor_lo);
-	vec4 offset = vec4(offset_hi, offset_lo);
-	vec4 juliaPoint = vec4(juliaPoint_hi, juliaPoint_lo);
+	vec4 offset = vec4(offset_hi.x, offset_lo.x, offset_hi.y, offset_lo.y);
+	vec4 juliaPoint = vec4(juliaPoint_hi.x, juliaPoint_lo.x, juliaPoint_hi.y, juliaPoint_lo.y);
     vec4 res = toHiLoVec2(vec2(1.0/SCREEN_PIXEL_SIZE.x, 1.0/SCREEN_PIXEL_SIZE.y));
     vec4 c = transformHiLo(toHiLoVec2(vec2(UV.x/SCREEN_PIXEL_SIZE.x,
                               UV.y/SCREEN_PIXEL_SIZE.y)),
@@ -79,10 +79,10 @@ void fragment() {
         /* normal fractal iteration */
         z = func(z, c);
 
-		if (ltHiLo(magHiLo(z - z_prev), eps)) {
-            cycle = true;
-            break;
-        }
+		//if (ltHiLo(magHiLo(subHiLo4(z, z_prev)), eps)) {
+            //cycle = true;
+            //break;
+        //}
         vec4 delta = subHiLo4(z, c);
         vec2 r2 = magSqHiLo(delta);
         trap = minHiLo(trap, r2);
@@ -119,8 +119,8 @@ void fragment() {
         }
         if (lam == power) {     // time to shift the reference forward
             tortoise = z;
-            power   <<= 1;      // power *= 2
-            lam      = 0;
+            power <<= 1;      // power *= 2
+            lam  = 0;
         }
 		z_prev = z;
     }

@@ -58,6 +58,7 @@ public partial class RecompileComplexRenderer : LineEdit
         try
         {
             String glsl = ExpressionToGLSL.ExpressionParser.ConvertExpressionToGlsl(Text, useC);
+            GD.Print(glsl);
             String code = oldCode;
             code = code.Replace("vec4(0.00)", glsl);
 
