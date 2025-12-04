@@ -24,10 +24,6 @@ bg_color = Color(0.647059, 0.701961, 0.776471, 0.780392)
 
 [node name="ComplexRenderer" type="Node2D"]
 
-[node name="Pause" parent="." instance=ExtResource("3_br55d")]
-layer = 96
-visible = false
-
 [node name="Sprite2D" type="Sprite2D" parent="." node_paths=PackedStringArray("plotter", "pauseMenu")]
 texture_filter = 1
 material = SubResource("ShaderMaterial_8cjuv")
@@ -95,6 +91,11 @@ text = "FANCY COLORING"
 
 [node name="Node2D" type="Node2D" parent="."]
 script = ExtResource("5_d33t1")
+
+[node name="Pause" parent="." node_paths=PackedStringArray("textEdit") instance=ExtResource("3_br55d")]
+layer = 96
+visible = false
+textEdit = NodePath("")
 
 [connection signal="item_selected" from="CanvasLayer/Control/OptionButton" to="Sprite2D" method="setColor"]
 [connection signal="toggled" from="CanvasLayer/Control/Button2" to="Sprite2D" method="ToggleFancy"]
