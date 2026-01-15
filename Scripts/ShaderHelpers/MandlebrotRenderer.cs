@@ -1,21 +1,32 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Godot;
 using Vector2 = Godot.Vector2;
 
 public partial class MandlebrotRenderer : ViewBase
 {
-    [Export] public LineEdit TextEdit;
+    [Export]
+    public LineEdit TextEdit;
 
     public Complex juliaPoint;
 
     public bool julia = false;
-    [Export] public int plotterIterations = 250;
-    [Export] public Plotter plotter;
-    [Export] public RecompileComplexRenderer compiler;
-    [Export] public Button juliaBox;
-    [Export] public Button intColorBox;
+
+    [Export]
+    public int plotterIterations = 250;
+
+    [Export]
+    public Plotter plotter;
+
+    [Export]
+    public RecompileComplexRenderer compiler;
+
+    [Export]
+    public Button juliaBox;
+
+    [Export]
+    public Button intColorBox;
     bool intColor = false;
     bool juliaFromBox;
 
@@ -34,7 +45,8 @@ public partial class MandlebrotRenderer : ViewBase
             julia = !julia;
             juliaBox.SetPressedNoSignal(julia);
         }
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse =
+            vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         if (Input.IsActionPressed("RightClick") || juliaFromBox)
         {
@@ -70,14 +82,15 @@ public partial class MandlebrotRenderer : ViewBase
 
     public void ToggleJulia(bool toggle)
     {
-
         julia = toggle;
         juliaFromBox = true;
     }
+
     public void ToggleIntColor(bool toggle)
     {
         intColor = toggle;
     }
+
     public override void PushUniforms()
     {
         base.PushUniforms();

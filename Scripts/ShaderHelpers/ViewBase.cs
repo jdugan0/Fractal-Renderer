@@ -1,19 +1,24 @@
-using Godot;
 using System;
 using System.Numerics;
+using Godot;
 
 public partial class ViewBase : Sprite2D
 {
-    [Export] public double speed = 1;
+    [Export]
+    public double speed = 1;
     public Complex offset = Complex.Zero;
     public double zoom = 0.1;
 
-    [Export] public PauseMenu pauseMenu;
+    [Export]
+    public PauseMenu pauseMenu;
 
-    public int _w, _h;
+    public int _w,
+        _h;
     ImageTexture _tex = new ImageTexture();
     public ShaderMaterial _mat;
-    [Export] Label coordLabel;
+
+    [Export]
+    Label coordLabel;
 
     public override void _Ready()
     {
@@ -26,7 +31,7 @@ public partial class ViewBase : Sprite2D
         Texture = _tex;
 
         _mat = (ShaderMaterial)Material;
-        PushUniforms();            // first push
+        PushUniforms(); // first push
     }
 
     public override void _Process(double delta)
@@ -41,6 +46,7 @@ public partial class ViewBase : Sprite2D
         // double yPos = Math.Round(scale.Y * Math.Clamp(zoom, 1, 1e99)) / Math.Clamp(zoom, 1, 1e99);
         // coordLabel.Text = String.Format("{0}, {1}i", xPos, yPos);
     }
+
     public virtual void HandleInput(double delta)
     {
         if (pauseMenu.paused)
@@ -48,14 +54,24 @@ public partial class ViewBase : Sprite2D
             return;
         }
         Complex v = Complex.Zero;
-        if (Input.IsActionPressed("UP")) v += -Complex.ImaginaryOne;
-        if (Input.IsActionPressed("DOWN")) v += Complex.ImaginaryOne;
-        if (Input.IsActionPressed("LEFT")) v += -Complex.One;
-        if (Input.IsActionPressed("RIGHT")) v += Complex.One;
+        if (Input.IsActionPressed("UP"))
+            v += -Complex.ImaginaryOne;
+        if (Input.IsActionPressed("DOWN"))
+            v += Complex.ImaginaryOne;
+        if (Input.IsActionPressed("LEFT"))
+            v += -Complex.One;
+        if (Input.IsActionPressed("RIGHT"))
+            v += Complex.One;
 
-        if (Input.IsActionPressed("ZoomIn")) zoom += (delta) * zoom;
-        if (Input.IsActionPressed("ZoomOut")) zoom -= (delta) * zoom;
-        if (Input.IsActionJustPressed("Home")) { offset = Complex.Zero; zoom = 0.1f; }
+        if (Input.IsActionPressed("ZoomIn"))
+            zoom += (delta) * zoom;
+        if (Input.IsActionPressed("ZoomOut"))
+            zoom -= (delta) * zoom;
+        if (Input.IsActionJustPressed("Home"))
+        {
+            offset = Complex.Zero;
+            zoom = 0.1f;
+        }
 
         zoom = Mathf.Clamp(zoom, 1e-32f, 1e9f);
         if (v.Magnitude > 0)
@@ -66,7 +82,8 @@ public partial class ViewBase : Sprite2D
 
     public virtual void PushUniforms()
     {
-        if (_mat == null) return;
+        if (_mat == null)
+            return;
         _mat.SetShaderParameter("offset", complexToVec(offset));
         _mat.SetShaderParameter("zoomFactor", (float)zoom);
     }

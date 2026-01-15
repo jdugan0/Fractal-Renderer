@@ -1,21 +1,26 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Numerics;
+using Godot;
 using Vector2 = Godot.Vector2;
 
 public partial class ComplexRenderer : ViewBase
 {
-    [Export] public LineEdit TextEdit;
+    [Export]
+    public LineEdit TextEdit;
 
-    [Export] public Button magnitudeBox;
+    [Export]
+    public Button magnitudeBox;
 
-    [Export] public Button derivativeBox;
+    [Export]
+    public Button derivativeBox;
 
-    [Export] public RecompileComplexRenderer compiler;
-    [Export] public Plotter plotter;
+    [Export]
+    public RecompileComplexRenderer compiler;
 
+    [Export]
+    public Plotter plotter;
 
     public bool magnitude;
     public bool derivative;
@@ -40,7 +45,8 @@ public partial class ComplexRenderer : ViewBase
         if (Input.IsActionPressed("Click"))
         {
             List<Complex> points = new List<Complex>();
-            Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+            Complex mouse =
+                vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
             Complex scale = (mouse / _w / zoom) + offset;
             Complex start = scale;
             List<Vector2> vector2List = new List<Vector2>();
@@ -62,6 +68,7 @@ public partial class ComplexRenderer : ViewBase
     {
         derivative = toggeled;
     }
+
     public void toggleMag(bool toggeled)
     {
         magnitude = toggeled;
@@ -72,6 +79,5 @@ public partial class ComplexRenderer : ViewBase
         base.PushUniforms();
         _mat.SetShaderParameter("render", magnitude);
         _mat.SetShaderParameter("prime", derivative);
-
     }
 }

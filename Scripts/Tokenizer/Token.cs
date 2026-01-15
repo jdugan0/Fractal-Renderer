@@ -13,7 +13,7 @@ namespace ExpressionToGLSL
         RParen,
         Identifier,
         EndIdentifier,
-        EOF
+        EOF,
     }
 
     internal class Token
@@ -29,7 +29,6 @@ namespace ExpressionToGLSL
             IsImaginary = isImaginary;
         }
 
-        public override string ToString() => 
-            $"{Type}('{Text}'){(IsImaginary ? "[i]" : "")}";
+        public override string ToString() => $"{Type}('{Text}'){(IsImaginary ? "[i]" : "")}";
     }
 }

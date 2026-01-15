@@ -1,7 +1,7 @@
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Godot;
 using Vector2 = Godot.Vector2;
 
 public partial class NewtonRenderer : ViewBase
@@ -9,9 +9,14 @@ public partial class NewtonRenderer : ViewBase
     List<Complex> roots = new List<Complex>();
     int color = 0;
     bool hover = false;
-    [Export] public int plotterIterations = 250;
-    [Export] public Plotter plotter;
+
+    [Export]
+    public int plotterIterations = 250;
+
+    [Export]
+    public Plotter plotter;
     bool fancy = true;
+
     public override void _Ready()
     {
         base._Ready();
@@ -19,13 +24,15 @@ public partial class NewtonRenderer : ViewBase
         roots.Add(new Complex(0, 1));
         roots.Add(new Complex(1, 0));
     }
+
     public override void _UnhandledInput(InputEvent @event)
     {
         if (pauseMenu.paused)
         {
             return;
         }
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse =
+            vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         if (@event.IsActionPressed("Click"))
         {
@@ -33,14 +40,12 @@ public partial class NewtonRenderer : ViewBase
         }
         if (@event.IsActionPressed("MMB"))
         {
-
             int id = findClosest();
             if (id != -1 && roots.Count > 1)
             {
                 roots.RemoveAt(id);
             }
         }
-
     }
 
     public void ToggleFancy(bool toggle)
@@ -50,7 +55,8 @@ public partial class NewtonRenderer : ViewBase
 
     public override void HandleInput(double delta)
     {
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse =
+            vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         base.HandleInput(delta);
         if (pauseMenu.paused)
@@ -63,9 +69,7 @@ public partial class NewtonRenderer : ViewBase
             if (id != -1)
             {
                 roots[id] = scale;
-
             }
-
         }
         if (Input.IsActionPressed("X") && !hover)
         {
@@ -129,9 +133,11 @@ public partial class NewtonRenderer : ViewBase
         _mat.SetShaderParameter("color", color);
         _mat.SetShaderParameter("fancy_shading", fancy);
     }
+
     public int findClosest()
     {
-        Complex mouse = vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
+        Complex mouse =
+            vecToComplex(GetViewport().GetMousePosition()) + new Complex(-_w / 2, -_h / 2);
         Complex scale = (mouse / _w / zoom) + offset;
         double best = double.MaxValue;
         int id = -1;

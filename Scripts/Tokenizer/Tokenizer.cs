@@ -28,11 +28,13 @@ namespace ExpressionToGLSL
                 {
                     _pos++;
                 }
-                else if (TryTokenizeOperator(c, tokens) ||
-                         TryTokenizeVariable(c, tokens) ||
-                         TryTokenizeStandaloneI(c, tokens) ||
-                         TryTokenizeFunction(tokens) ||
-                         TryTokenizeNumeric(c, tokens))
+                else if (
+                    TryTokenizeOperator(c, tokens)
+                    || TryTokenizeVariable(c, tokens)
+                    || TryTokenizeStandaloneI(c, tokens)
+                    || TryTokenizeFunction(tokens)
+                    || TryTokenizeNumeric(c, tokens)
+                )
                 {
                     continue;
                 }
@@ -58,10 +60,11 @@ namespace ExpressionToGLSL
                 '*' => TokenType.Asterisk,
                 '/' => TokenType.Slash,
                 '^' => TokenType.Caret,
-                _ => null
+                _ => null,
             };
 
-            if (!type.HasValue) return false;
+            if (!type.HasValue)
+                return false;
 
             tokens.Add(new Token(type.Value, c.ToString()));
             _pos++;
@@ -76,7 +79,8 @@ namespace ExpressionToGLSL
 
         private bool TryTokenizeVariable(char c, List<Token> tokens)
         {
-            if (!IsNextLetterSeparate()) return false;
+            if (!IsNextLetterSeparate())
+                return false;
 
             char lower = char.ToLower(c);
             if (lower == 'z' || (lower == 'c' && _useC) || (lower == 'p' && _useC))
@@ -102,7 +106,8 @@ namespace ExpressionToGLSL
 
         private bool TryTokenizeNumeric(char c, List<Token> tokens)
         {
-            if (!char.IsDigit(c) && c != '.') return false;
+            if (!char.IsDigit(c) && c != '.')
+                return false;
 
             ParseNumber(tokens);
             return true;
@@ -147,14 +152,16 @@ namespace ExpressionToGLSL
             }
 
             string numText = _input.Substring(start, _pos - start - (hasI ? 1 : 0));
-            if (numText.EndsWith(".")) numText += "0";
+            if (numText.EndsWith("."))
+                numText += "0";
 
             tokens.Add(new Token(TokenType.Number, numText, hasI));
         }
 
         private bool TryTokenizeFunction(List<Token> tokens)
         {
-            if (!char.IsLetter(_input[_pos])) return false;
+            if (!char.IsLetter(_input[_pos]))
+                return false;
 
             var functionMap = new Dictionary<string, (string token, int length)>
             {
@@ -168,14 +175,15 @@ namespace ExpressionToGLSL
                 { "tan", ("tan", 3) },
                 { "ln", ("ln", 2) },
                 { "pi", (Math.PI.ToString(), 2) },
-                { "e", (Math.E.ToString(), 1) }
+                { "e", (Math.E.ToString(), 1) },
             };
 
             foreach (var (key, (token, length)) in functionMap)
             {
                 if (_input.Substring(_pos).StartsWith(key, StringComparison.OrdinalIgnoreCase))
                 {
-                    var tokenType = key == "pi" || key == "e" ? TokenType.Number : TokenType.Identifier;
+                    var tokenType =
+                        key == "pi" || key == "e" ? TokenType.Number : TokenType.Identifier;
                     tokens.Add(new Token(tokenType, token));
                     _pos += length;
                     return true;

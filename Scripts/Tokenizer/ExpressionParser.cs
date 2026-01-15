@@ -15,7 +15,10 @@ namespace ExpressionToGLSL
             return ast.ToGlsl();
         }
 
-        public static Func<Complex, Complex, Complex> CompileToFunc(string expression, bool useC = false)
+        public static Func<Complex, Complex, Complex> CompileToFunc(
+            string expression,
+            bool useC = false
+        )
         {
             var tokenizer = new Tokenizer(expression, useC);
             var tokens = tokenizer.Tokenize();
@@ -26,7 +29,9 @@ namespace ExpressionToGLSL
             var cParam = Expression.Parameter(typeof(Complex), "c");
             var body = ast.ToExpression(zParam, cParam);
 
-            return Expression.Lambda<Func<Complex, Complex, Complex>>(body, zParam, cParam).Compile();
+            return Expression
+                .Lambda<Func<Complex, Complex, Complex>>(body, zParam, cParam)
+                .Compile();
         }
     }
 }

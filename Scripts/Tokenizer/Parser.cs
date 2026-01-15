@@ -124,7 +124,8 @@ namespace ExpressionToGLSL
         {
             foreach (var type in types)
             {
-                if (Current.Type == type) return true;
+                if (Current.Type == type)
+                    return true;
             }
             return false;
         }

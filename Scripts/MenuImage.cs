@@ -1,9 +1,11 @@
-using Godot;
 using System;
+using Godot;
 
 public partial class MenuImage : Panel
 {
-    [Export] public Texture2D[] images;
+    [Export]
+    public Texture2D[] images;
+
     public void SwitchImage(int id)
     {
         var stylebox = new StyleBoxTexture();
